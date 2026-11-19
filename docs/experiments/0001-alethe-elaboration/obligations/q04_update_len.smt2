@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const a (Seq Int))(declare-const i Int)(declare-const v Int)
+(assert (and (<= 0 i) (< i (seq.len a))))
+(assert (not (= (seq.len (seq.update a i (seq.unit v))) (seq.len a))))
+(check-sat)

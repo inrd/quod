@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x (_ BitVec 32))
+(assert (< (ubv_to_int x) 2147483648))
+(assert (not (= (ubv_to_int (bvshl x #x00000001)) (* 2 (ubv_to_int x)))))
+(check-sat)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x Int)
+(assert (= (mod x 2) 0))
+(assert (not (= (mod (+ x 1) 2) 1)))
+(check-sat)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x Int)
+(assert (and (<= (- 2147483648) x) (<= x 2147483647) (distinct x (- 2147483648))))
+(assert (not (and (<= (- 2147483648) (- x)) (<= (- x) 2147483647))))
+(check-sat)

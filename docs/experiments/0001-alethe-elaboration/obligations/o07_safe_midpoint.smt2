@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const lo Int)(declare-const hi Int)
+(assert (and (<= 0 lo) (<= lo hi) (<= hi 4294967295)))
+(assert (not (<= (+ lo (div (- hi lo) 2)) 4294967295)))
+(check-sat)

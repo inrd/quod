@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x (_ BitVec 32))(declare-const y (_ BitVec 32))
+(assert (<= (+ (ubv_to_int x) (ubv_to_int y)) 4294967295))
+(assert (not (= (ubv_to_int (bvadd x y)) (+ (ubv_to_int x) (ubv_to_int y)))))
+(check-sat)

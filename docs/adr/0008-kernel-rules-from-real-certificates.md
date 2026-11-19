@@ -1,0 +1,104 @@
+# ADR-0008: Kernel rules fitted to real solver certificates
+
+- **Status:** Proposed
+- **Date:** 2026-11-20
+- **Deciders:** —
+- **Author:** Claude (agent), at the maintainer's request
+- **Supersedes:** [ADR-0003](0003-kernel-logic-and-proof-format.md) (on acceptance, ADR-0003's status becomes `Superseded by ADR-0008`)
+- **Closes:** none new; keeps [open-questions.md §2](../open-questions.md#2-kernel-logic-and-proof-term-format) resolved; opens two sub-questions (bit-vectors, sequences)
+- **Depends on:** ADR-0001, ADR-0002, [experiment 0001](../experiments/0001-alethe-elaboration.md)
+
+## Context
+
+ADR-0003 chose a many-sorted first-order kernel checking flat, refutational, search-free proof steps, with Alethe from cvc5 as the source of certificates and a strict accepted-rule list. [Experiment 0001](../experiments/0001-alethe-elaboration.md) (61 obligations, cvc5 1.4.2) tested that choice:
+
+| Finding | Consequence for ADR-0003 |
+|---|---|
+| 0 of 61 obligations stay inside the accepted rules, even after trivial elaboration | fails its own validation criterion |
+| Every non-bit-vector proof needs only accepted rules, premise forms (`cong`, `trans`, `symm`, `and_intro`) and **local rewrites**: ~60 named RARE equation schemas, `poly_simp`, `evaluate`, `la_mult_*` | the gap is local rewriting, not search |
+| cvc5's Alethe printer refuses sequences, datatypes and `div`/`mod` by a variable (14 of 56 solved obligations); cvc5's native CPC format proves all 56 with no trust steps | Alethe cannot be the only certificate source |
+| 9 of 12 solved bit-vector obligations use bit-blasting or `hole` | the `qd_bv_int` route is unvalidated |
+| CPC proves sequence facts with string-theory word-equation rules; the only array-encoded obligation (`q10`) printed fine in Alethe | the planned "sequence axioms" match no solver's output |
+
+What held up: no `lia_generic`, no `all_simplify`, no search inside any step, and nonlinear multiplication handled by small local lemmas. The design is sound; the rule list and certificate source were wrong.
+
+## Options considered
+
+### Option A: Keep ADR-0003; put everything in the elaborator
+- For: no kernel change.
+- Against: the elaborator would have to re-prove every rewrite, normalization and evaluation step from accepted rules, multiplying proof size (already median 230 steps) for no soundness gain; it would still have no Alethe certificates for sequences and datatypes.
+
+### Option B: Accept the local rules directly, trusted as axioms
+- For: certificates check almost as emitted.
+- Against: ~60 rewrite schemas become trusted axioms, much of which is provable; RARE's rule set is cvc5's to change, not Quod's.
+
+### Option C: Accept local rules, but justify rewrite schemas as kernel-checked lemmas; widen the certificate sources; split off bit-vectors and sequences
+- For: proofs stay close to solver output; rewrite schemas that are provable from the core rules add no trust; the ones that are not are enumerated and visible; unsupported theories are handled by encoding choices and later experiments rather than guesses.
+- Against: more kernel rules than ADR-0003 (normalizer, evaluator, schema instantiation); two certificate formats for the elaborator to read.
+
+## Decision
+
+Option C. Everything in ADR-0003 that is not changed below stays: logic and sorts, refutational proofs whose hypotheses and negated goal the kernel builds from the obligation, Alethe S-expression syntax as the **kernel's** proof format, `spec fn` definitional extension with termination check, defunctionalization, acyclic lemma citations, one versioned axiom file printed in every trust report.
+
+### 1. Accepted rules
+
+| Group | Rules | Change from ADR-0003 |
+|---|---|---|
+| Propositional | `resolution`, `th_resolution`, Tseitin clause rules, `contraction`, `reordering`, `true`, `false`, `not_not`, `subproof` | `subproof`, `true`, `false` made explicit |
+| Equality | `refl`, `eq_reflexive`, `eq_symmetric`, `eq_transitive`, `eq_congruent`, `eq_congruent_pred`, **`cong`, `trans`, `symm`, `and_intro`** | premise forms added (32% of steps in experiment 0001; each is a local check) |
+| Linear arithmetic | `la_generic` with explicit Farkas coefficients, `la_disequality`, `la_totality`, `la_tautology`, `qd_int_cut` | unchanged |
+| Nonlinear lemmas | **`la_mult_pos`, `la_mult_neg`, `la_mult_sign`, `la_mult_abs_comparison`** | new; each checks one sign/monotonicity instance |
+| Normalization | **`qd_poly_norm`** (Alethe `poly_simp`, `poly_simp_rel`): both sides normalize to the same polynomial over `Int` with rational coefficients, using `la_generic`'s normalizer | new; the normalizer is already needed by `la_generic` |
+| Evaluation | **`qd_evaluate`** (Alethe `evaluate`): a ground term over `Bool`/`Int`/`BV` literals equals its value | new; needs arbitrary-precision integers, which `la_generic` needs anyway |
+| Rewrite schemas | **`qd_rewrite <name>`**: the step is an instance of a named, enumerated equation schema (see §2) | new |
+| Quantifiers | `forall_inst` with explicit terms, `sko_forall`, `sko_ex`, `bind` | unchanged |
+| Datatypes | constructor injectivity, distinctness, projection, exhaustiveness | unchanged (still Quod rules) |
+| Quod-specific | `qd_def_unfold`, `qd_induction`, `qd_lemma`, `qd_bv_int` | unchanged; `qd_bv_int` now depends on §4 |
+
+`qd_poly_norm` must not blow up: the kernel rejects a step whose normalized polynomial exceeds a fixed size bound (set in `kernel/`), so checking time stays bounded by proof size.
+
+Still rejected: `hole`, `trust`, `lia_generic`, `all_simplify`, broad `*_simplify` rules as kernel rules, and bit-blasting (`bv_bitblast_*`, `bv_bitwise_slicing`).
+
+### 2. Rewrite schemas are lemmas first, axioms only when they must be
+
+- A schema is a fixed-arity equation `∀x̄. l = r` with a name, stored in `kernel/rewrites` (versioned).
+- A schema whose universal closure can be **proven from the accepted rules** (most arithmetic and Boolean ones, e.g. `arith-elim-lt`, `bool-double-not-elim`, `ite-true-cond`) ships with that proof. The kernel checks it once when loading the file; using it adds **no trust**.
+- A schema that cannot be proven that way (e.g. those relying on `div`/`mod` totality, ADR-0002's conventions) goes into the **axiom file**, is printed in the trust report, and needs a one-line justification.
+- Schemas with list variables (RARE's n-ary rules, e.g. over `and` with any number of arguments) are **not** schemas. The elaborator rewrites those steps into fixed-arity instances or propositional reasoning.
+- Initial list: the rewrites that experiment 0001 needed, excluding bit-vector ones until §4 is decided. A provable schema is a lemma, not a new rule, so it can be added by PR with its proof; this is how CLAUDE.md's "rule or axiom changes need an ADR" applies to schemas. An unprovable schema is an axiom and needs an ADR, as before.
+
+### 3. Certificate sources
+
+- The **untrusted elaborator** accepts cvc5 certificates in **Alethe and CPC**. CPC is the default for obligations involving datatypes or `div`/`mod` by a variable, which Alethe does not print.
+- The elaborator rewrites `*_simplify`, `aci_simp`, `ac_simp`, `distinct_elim` and similar steps into accepted rules. These are propositional or definitional equivalences over the step's own atoms, so small, local proofs exist; producing them is elaborator work, outside the trusted base.
+- The kernel's format does not change: it never reads CPC.
+
+### 4. Bit-vectors: open, with a default
+
+Bit-vector reasoning is not decided by this ADR. Until an experiment settles it:
+
+- The kernel accepts bit-vector steps only through `qd_evaluate` and `qd_rewrite` schemas that are provable (§2) or listed axioms.
+- Experiment 0002 tests two routes on experiment 0001's `x`/`c` obligations: (a) a library of `qd_bv_int` lemmas (masks, shifts, add-without-wrap) applied by the elaborator or agent; (b) accepting bit-blasting for a bounded width (≤ 64) with a kernel-side size limit. The result decides by a follow-up ADR.
+
+### 5. Sequences: encode as arrays
+
+- The kernel sort `Seq(S)` keeps ADR-0003's meaning (length + indexing). Its axioms are **array-style**: read-over-write (same and different index), length preserved by update, and length/index of a sub-range view.
+- The obligation generator sends sequence obligations to solvers **as SMT arrays plus an explicit length**, not as SMT-LIB `Seq`. Phases 1–2 only need length, indexing, update and sub-range slicing, which this encoding expresses without string theory.
+- Experiment 0003 repeats experiment 0001's `q` obligations in this encoding before the kernel implements `Seq` rules.
+
+## Consequences
+
+- **Trusted base grows:** kernel code for `qd_poly_norm`'s size bound, `qd_evaluate`, `qd_rewrite` instantiation, the four `la_mult_*` checks, and the premise-form equality rules; axiom-file entries for unprovable rewrite schemas and `div`/`mod` definitions (the latter were needed under ADR-0003 too). Provable rewrite schemas add no trust. The kernel's 5,000-line budget (ADR-0001) still applies; if this does not fit, that is a reason to revisit before raising the budget.
+- **Proof size** stays close to solver output (median ~230 Alethe steps in experiment 0001) instead of growing with re-proven rewrites.
+- **Agent loop:** kernel errors still name one step. A failing `qd_rewrite` names the schema, which an agent can look up in `kernel/rewrites`.
+- **Elaborator** is larger (two input formats) but stays untrusted.
+- **Slice (ADR-0006):** S4 can start on linear arithmetic, Booleans, quantifiers and arrays-as-sequences once experiment 0003 passes; bit-vector support waits for experiment 0002.
+- Docs to update on acceptance: ADR-0003 status, `docs/adr/README.md`, `kernel/README.md` (rules, rewrites file, size bound), `architecture.md` (component table: elaborator inputs), `oracle-protocol.md` (`proof/submit` still takes Alethe text; certificates may come from either format), `open-questions.md` §2 and §12, new open-question entries for §4 and §5 if not settled first.
+
+## Validation
+
+- Re-run experiment 0001's corpus through the elaborator and kernel once built: **≥ 80% of solved non-bit-vector obligations** check without manual steps.
+- Every schema in `kernel/rewrites` is either kernel-proven at load or listed in the axiom file; CI fails otherwise.
+- Kernel within budget with all rules above.
+- Experiments 0002 (bit-vectors) and 0003 (sequences as arrays) completed, each followed by an ADR or an update to this one before acceptance.
+- Revisit if cvc5 changes RARE or CPC so that the schema list churns between releases, or if `qd_poly_norm`'s size bound rejects common obligations.

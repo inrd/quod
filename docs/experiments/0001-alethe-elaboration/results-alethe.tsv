@@ -1,0 +1,62 @@
+obligation	alethe_class	steps	A	B	C	D	C_and_D_rules
+b01_index_lt_len	C	65	24	20	21	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+b02_loop_inv_preserve	C	66	27	20	19	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b03_loop_inv_init	C	40	8	21	11	0	 aci_simp rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b04_slice_offset	C	195	108	39	48	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b05_subslice_of_subslice	C	277	127	73	77	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b06_reverse_index	C	306	134	95	77	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b07_binsearch_mid	C	342	146	106	90	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-int-div-total rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt div_intro rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+b08_termination_measure	C	78	14	35	29	0	 aci_simp rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-geq-norm1-int rare_rewrite:arith-elim-lt rare_rewrite:arith-geq-tighten
+b09_copy_with_offset	C	70	25	22	23	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+b10_countdown	C	47	10	20	17	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+c01_mask_as_index	D	257	10	184	55	8	 rare_rewrite:bool-eq-true aci_simp rare_rewrite:bool-double-not-elim hole:failed rare_rewrite:ite-then-true and_simplify evaluate rare_rewrite:uf-bv2nat-geq-elim bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat ac_simp bv_bitblast_step_var rare_rewrite:bv-ule-eliminate bv_bitwise_slicing bv_bitblast_step_extract rare_rewrite:bv-uge-eliminate rare_rewrite:arith-leq-norm rare_rewrite:ite-then-false bv_bitblast_step_bvult
+c02_hash_bucket	D	333	13	233	79	8	 rare_rewrite:bool-eq-true aci_simp rare_rewrite:bool-double-not-elim hole:failed rare_rewrite:ite-then-true and_simplify evaluate rare_rewrite:uf-bv2nat-geq-elim bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat ac_simp bv_bitblast_step_var rare_rewrite:bv-ule-eliminate rare_rewrite:arith-elim-lt bv_bitwise_slicing bv_bitblast_step_extract rare_rewrite:bv-ult-zero-2 rare_rewrite:bv-uge-eliminate rare_rewrite:ite-then-false bv_bitblast_step_bvult rare_rewrite:arith-elim-leq
+c03_top_byte	D	254	13	181	54	6	 rare_rewrite:bool-eq-true aci_simp rare_rewrite:bool-double-not-elim rare_rewrite:ite-then-true and_simplify evaluate rare_rewrite:uf-bv2nat-geq-elim bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat rare_rewrite:bv-lshr-by-const-1 ac_simp bv_bitblast_step_var rare_rewrite:bv-ule-eliminate rare_rewrite:arith-elim-lt bv_bitblast_step_extract rare_rewrite:bv-uge-eliminate rare_rewrite:ite-then-false bv_bitblast_step_bvult
+c04_add_no_wrap	-
+c05_shl_is_mul	-
+c06_range	C	143	10	90	43	0	 rare_rewrite:ite-then-true evaluate rare_rewrite:uf-bv2nat-geq-elim rare_rewrite:bv-ule-eliminate rare_rewrite:bv-ult-zero-2 rare_rewrite:bv-uge-eliminate rare_rewrite:arith-leq-norm rare_rewrite:ite-then-false rare_rewrite:arith-elim-leq
+d01_ring_index_var	-
+d02_div_mul_le	-
+d03_divisor_nonzero	C	14	7	4	3	0	 rare_rewrite:bool-double-not-elim evaluate distinct_elim
+d04_ring_index_const	C	65	21	26	18	0	 rare_rewrite:bool-double-not-elim poly_simp rare_rewrite:mod-elim evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-int-mod-total div_intro rare_rewrite:arith-elim-leq
+d05_parity	C	126	39	46	41	0	 rare_rewrite:bool-double-not-elim poly_simp rare_rewrite:mod-elim evaluate poly_simp_rel comp_simplify rare_rewrite:arith-int-geq-tighten rare_rewrite:arith-elim-lt rare_rewrite:arith-int-mod-total div_intro rare_rewrite:arith-geq-tighten rare_rewrite:arith-elim-leq
+d06_average_le_max	C	546	218	164	164	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify rare_rewrite:ite-eq evaluate rare_rewrite:eq-refl poly_simp_rel rare_rewrite:arith-int-div-total rare_rewrite:arith-elim-lt div_intro rare_rewrite:arith-geq-tighten equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+m01_mul_u16_fits_u32	C	395	220	105	70	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate la_mult_pos poly_simp_rel comp_simplify rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt rare_rewrite:arith-geq-tighten equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+m02_2d_index	C	1115	601	290	224	0	 rare_rewrite:bool-double-not-elim la_mult_sign poly_simp implies_simplify evaluate rare_rewrite:eq-refl poly_simp_rel rare_rewrite:arith-abs-int-gt comp_simplify rare_rewrite:ite-true-cond rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt la_mult_abs_comparison equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+m03_2d_index_fits	-
+m04_square_i32	C	366	206	98	62	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate la_mult_pos poly_simp_rel comp_simplify rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt rare_rewrite:arith-geq-tighten equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+m05_mul_monotone	C	1104	606	285	213	0	 rare_rewrite:bool-double-not-elim la_mult_sign poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:bool-impl-false1 rare_rewrite:arith-abs-int-gt comp_simplify rare_rewrite:arith-elim-gt rare_rewrite:arith-geq-norm1-int rare_rewrite:arith-elim-lt la_mult_abs_comparison equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+m06_strided_index	C	1726	877	512	337	0	 rare_rewrite:bool-double-not-elim la_mult_sign rare_rewrite:arith-abs-eq poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-abs-int-gt comp_simplify rare_rewrite:ite-true-cond rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt la_mult_abs_comparison rare_rewrite:arith-geq-tighten equiv_simplify rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o01_double	C	32	7	12	13	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-int-geq-tighten rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o02_bounded_sum	C	332	174	81	77	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+o03_increment	C	48	15	17	16	0	 rare_rewrite:bool-double-not-elim poly_simp evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+o04_sub_no_underflow	C	228	129	57	42	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o05_neg_nonneg_i32	C	150	83	34	33	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o06_abs_i32	C	217	122	55	40	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel comp_simplify distinct_elim rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o07_safe_midpoint	C	332	123	122	87	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate poly_simp_rel rare_rewrite:arith-int-div-total rare_rewrite:arith-elim-gt rare_rewrite:arith-elim-lt div_intro rare_rewrite:arith-geq-tighten rare_rewrite:arith-leq-norm rare_rewrite:arith-elim-leq
+o08_widen_add	C	170	90	49	31	0	 rare_rewrite:bool-double-not-elim poly_simp implies_simplify evaluate rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+q01_zero_fill_preserve	-
+q02_vacuous_init	-
+q03_inv_to_post	-
+q04_update_len	-
+q05_running_max	-
+q06_search_not_found	-
+q07_search_found	-
+q08_copy_preserve	-
+q09_sorted_adjacent	-
+q10_zero_fill_array	C	170	74	51	45	0	 aci_simp rare_rewrite:bool-double-not-elim poly_simp rare_rewrite:ite-then-true evaluate rare_rewrite:bool-impl-elim poly_simp_rel rare_rewrite:bool-and-de-morgan comp_simplify rare_rewrite:eq-ite-lift rare_rewrite:arith-elim-lt rare_rewrite:array-read-over-write-split rare_rewrite:arith-geq-tighten rare_rewrite:arith-elim-leq
+q11_frame_update	-
+q12_specfn_unfold_ground	C	707	364	207	136	0	 rare_rewrite:bool-double-not-elim rare_rewrite:ite-false-cond poly_simp rare_rewrite:ite-not-cond implies_simplify evaluate poly_simp_rel comp_simplify rare_rewrite:ite-true-cond rare_rewrite:arith-elim-lt rare_rewrite:arith-leq-norm
+q13_specfn_unfold_step	C	659	296	205	158	0	 rare_rewrite:bool-double-not-elim poly_simp rare_rewrite:ite-not-cond implies_simplify rare_rewrite:ite-eq evaluate rare_rewrite:eq-refl poly_simp_rel comp_simplify rare_rewrite:arith-elim-lt equiv_simplify rare_rewrite:arith-leq-norm
+t01_ok_projection	-
+t02_ok_injective	-
+t03_ok_err_distinct	-
+t04_ring_push_len	-
+x01_and_mask	D	229	13	166	42	8	 aci_simp rare_rewrite:bool-eq-true rare_rewrite:bool-double-not-elim hole:failed and_simplify evaluate bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat bv_bitblast_step_var rare_rewrite:bv-ule-eliminate bv_bitwise_slicing bv_bitblast_step_extract bv_bitblast_step_bvult rare_rewrite:eq-symm
+x02_lshr_range	D	229	9	142	72	6	 rare_rewrite:bool-eq-true and_simplify evaluate bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat rare_rewrite:bv-lshr-by-const-1 ac_simp bv_bitblast_step_var bv_bitblast_step_extract bv_bitblast_step_bvult
+x03_clear_lowest_bit	D	1870	1303	363	197	7	 aci_simp rare_rewrite:bool-double-not-elim rare_rewrite:bool-xor-false poly_simp bv_bitblast_step_bvadd and_simplify evaluate bv_bitblast_step_const bv_bitblast_step_bvand rare_rewrite:bool-eq-false distinct_elim bv_bitblast_step_bvequal bv_bitblast_step_var rare_rewrite:bool-xor-true bv_bitblast_step_bvult rare_rewrite:eq-symm
+x04_shl_is_double	C	39	8	18	13	0	 poly_simp rare_rewrite:bv-shl-by-const-1 evaluate rare_rewrite:eq-refl rare_rewrite:bv-mult-pow2-1
+x05_or_ge	D	524	414	71	35	4	 aci_simp rare_rewrite:bool-double-not-elim bv_bitblast_step_var rare_rewrite:bv-ule-eliminate bv_bitblast_step_bvor rare_rewrite:bv-uge-eliminate bv_bitblast_step_bvult rare_rewrite:eq-symm
+x06_xor_self	C	16	5	6	5	0	 evaluate rare_rewrite:bv-xor-duplicate
+x07_mask_index	D	181	6	143	24	8	 rare_rewrite:bool-eq-true aci_simp hole:failed and_simplify evaluate bv_bitblast_step_const rare_rewrite:bool-eq-false bv_bitblast_step_concat ac_simp bv_bitblast_step_var bv_bitwise_slicing bv_bitblast_step_extract bv_bitblast_step_bvult
+x08_rotate_byte	D	190	26	99	63	2	 aci_simp rare_rewrite:bv-or-concat-pullup hole:failed rare_rewrite:bv-shl-by-const-1 evaluate rare_rewrite:bv-concat-merge-const rare_rewrite:eq-refl rare_rewrite:bv-and-concat-pullup rare_rewrite:bv-extract-whole rare_rewrite:bv-lshr-by-const-1 bv_bitwise_slicing rare_rewrite:bv-extract-concat-1 rare_rewrite:bv-extract-concat-3 rare_rewrite:bv-extract-extract

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-datatypes ((Res 0)) (((Ok (okv Int)) (Err (errv Int)))))
+(declare-const a Int)(declare-const e Int)
+(assert (= (Ok a) (Err e)))
+(check-sat)

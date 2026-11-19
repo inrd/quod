@@ -16,3 +16,6 @@ Design decisions for Quod are recorded here, one file per decision: `NNNN-short-
 | [0003](0003-kernel-logic-and-proof-format.md) | First-order kernel logic with flat, Alethe-based proof steps | Accepted |
 | [0004](0004-phase-1-typing-choices.md) | Phase-1 typing choices | Accepted (decision 1 partly superseded by 0005) |
 | [0005](0005-portable-static-checks-for-pointer-sized-integers.md) | Portable static checks for pointer-sized integers | Accepted |
+| [0006](0006-thin-end-to-end-slice.md) | Build a thin end-to-end slice before widening phases 1–3 | Proposed |
+| [0007](0007-trusted-obligation-generator.md) | A small trusted obligation generator over a specified Core IR | Proposed |
+| [0008](0008-kernel-rules-from-real-certificates.md) | Kernel rules fitted to real solver certificates (supersedes 0003) | Proposed |

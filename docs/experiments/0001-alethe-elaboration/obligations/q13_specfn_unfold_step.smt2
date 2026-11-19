@@ -1,0 +1,6 @@
+(set-logic ALL)
+(define-fun-rec sumto ((n Int)) Int (ite (<= n 0) 0 (+ n (sumto (- n 1)))))
+(declare-const i Int)(declare-const s Int)
+(assert (and (>= i 0) (= s (sumto i))))
+(assert (not (= (+ s (+ i 1)) (sumto (+ i 1)))))
+(check-sat)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const lo1 Int)(declare-const hi1 Int)(declare-const lo2 Int)(declare-const hi2 Int)(declare-const len Int)
+(assert (and (<= 0 lo1) (<= lo1 hi1) (<= hi1 len) (<= 0 lo2) (<= lo2 hi2) (<= hi2 (- hi1 lo1))))
+(assert (not (and (<= (+ lo1 lo2) (+ lo1 hi2)) (<= (+ lo1 hi2) len))))
+(check-sat)

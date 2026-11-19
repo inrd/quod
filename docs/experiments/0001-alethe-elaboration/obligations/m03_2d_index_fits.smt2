@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const r Int)(declare-const c Int)(declare-const R Int)(declare-const C Int)
+(assert (and (<= 0 r) (< r R) (<= 0 c) (< c C) (<= (* R C) 4294967295)))
+(assert (not (<= (+ (* r C) c) 4294967295)))
+(check-sat)

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const a Int)(declare-const b Int)
+(assert (and (<= 0 a) (<= 0 b)))
+(assert (not (<= (div (+ a b) 2) (ite (>= a b) a b))))
+(check-sat)

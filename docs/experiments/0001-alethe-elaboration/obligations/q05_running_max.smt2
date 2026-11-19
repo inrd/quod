@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-const a (Seq Int))(declare-const i Int)(declare-const m Int)
+(assert (and (<= 0 i) (< i (seq.len a))))
+(assert (forall ((k Int)) (=> (and (<= 0 k) (< k i)) (>= m (seq.nth a k)))))
+(assert (not (forall ((k Int)) (=> (and (<= 0 k) (< k (+ i 1))) (>= (ite (> (seq.nth a i) m) (seq.nth a i) m) (seq.nth a k))))))
+(check-sat)

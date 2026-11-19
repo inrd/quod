@@ -24,6 +24,21 @@ Coding agents now produce code faster than humans can read it. The bottleneck ha
 - A **primitive**: higher-level abstractions (collections, async, allocators, protocols) are built as verified libraries, not baked into the language.
 - A **two-stratum language**: a small human-auditable *spec* layer above a large, verbose, agent-written *impl + proofs* layer.
 
+## Why a new language
+
+Much of the value is language-independent and could sit under an existing language:
+
+| Language-independent | Needs control of the language |
+|---|---|
+| deterministic kernel, flat proof format ([ADR-0003](adr/0003-kernel-logic-and-proof-format.md)) | **No UB and nothing implicit by construction.** Verifying Rust or C means modelling their full semantics (coercions, auto-deref, trait resolution, macros, UB) in the obligation generator, which then grows the trusted base. |
+| oracle protocol, typed holes | **Effects and resource contracts in signatures**, checked for every call, not added as optional annotations. |
+| trust report, human report | **Obligation stability.** Stable obligation IDs need a front end whose desugaring Quod controls; a host compiler's internals change between versions (Prusti, Verus). |
+| | **Grammar shaped for agents:** LL(1), one canonical format, suitable for grammar-constrained decoding. |
+
+The cost is real: no training data ([open-questions §10](open-questions.md#10-mitigating-the-lack-of-training-data)). The bet is testable: the phase-9 benchmark compares against an existing verifier.
+
+> **Speculative:** if Quod does not beat the baseline on the agent-loop metric, the language-independent parts (kernel, oracle, reports) should be retargeted to a verified subset of an existing language rather than abandoned.
+
 ## What Quod is not
 
 - Not a language optimized for human ergonomics when writing implementations. Human ergonomics matter for *specs and reports*.

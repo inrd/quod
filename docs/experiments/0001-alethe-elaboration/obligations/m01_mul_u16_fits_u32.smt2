@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const a Int)(declare-const b Int)
+(assert (and (<= 0 a) (<= a 65535) (<= 0 b) (<= b 65535)))
+(assert (not (<= (* a b) 4294967295)))
+(check-sat)

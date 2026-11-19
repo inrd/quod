@@ -1,6 +1,6 @@
 # Roadmap
 
-Phases are ordered by dependency. Each has **exit criteria** that must all hold before the phase is considered done. Later phases are more speculative and will be revised by ADRs.
+Phases are ordered by dependency ([ADR-0006](adr/0006-thin-end-to-end-slice.md) proposes a thin end-to-end slice through phases 1–3 first). Each has **exit criteria** that must all hold before the phase is considered done. Later phases are more speculative and will be revised by ADRs.
 
 The key project metric (phase 9) should be measured informally from phase 3 onward, so design choices can be judged by their effect on the agent loop.
 

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const i Int)(declare-const n Int)
+(assert (and (< 0 i) (<= i n)))
+(assert (not (and (<= 0 (- i 1)) (< (- i 1) n))))
+(check-sat)

@@ -81,7 +81,7 @@ Soundness claim (target): *if the kernel accepts all obligations, every executio
 
 What this requires beyond the kernel:
 
-1. **Obligation generation is faithful.** If the VC generator is buggy, the kernel may check the wrong statements. Options (open):
+1. **Obligation generation is faithful.** If the VC generator is buggy, the kernel may check the wrong statements. Options (open; [ADR-0007](adr/0007-trusted-obligation-generator.md) proposes the first, over a specified Core IR):
    - keep the generator tiny and include it in the trusted base;
    - have the kernel itself compute obligations from Core IR (moves Core IR semantics into the kernel);
    - certify each generated VC against a formal semantics of Core IR.

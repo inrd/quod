@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const x Int)(declare-const n Int)
+(assert (and (<= 0 x) (< 0 n)))
+(assert (not (<= (* (div x n) n) x)))
+(check-sat)

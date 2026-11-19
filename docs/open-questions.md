@@ -132,3 +132,15 @@ These are complementary; the question is priority and budget.
 | **Trusted with recorded results** (cache solver verdicts) | Fastest. | Violates the small-kernel principle; must appear in the trust report. |
 
 A possible compromise: start with option 3 restricted and *visible in the trust report*, and migrate obligations to option 1 as reconstruction matures. That would itself need an ADR.
+
+## 13. Memory-model encoding in obligations
+
+The memory model is phase 5, but how memory appears in obligations is fixed in phase 2 ([ADR-0007](adr/0007-trusted-obligation-generator.md) Core IR, [ADR-0003](adr/0003-kernel-logic-and-proof-format.md) sorts). Retrofitting a heap into every obligation later would change Core IR, the generator and every stored proof. The encoding should be chosen before phase 2, even if permissions are implemented later.
+
+| Option | For | Against |
+|---|---|---|
+| **Value-level encoding** (Prusti/Creusot style): references translate to values; `&mut` parameters as copy-in/copy-out (or prophecies once references can be stored); explicit permissions only for raw pointers and FFI | Obligations stay over `Int`/`BV`/`Seq`/datatypes, no heap sort; proofs are smaller and easier for agents; phase-1 references are already second-class with no mutable aliasing ([spec/typing.md §8](../spec/typing.md)), so this is exact for phases 1–4 | Stored references, regions and shared mutable structures need prophecies or a second mechanism; two encodings to keep consistent |
+| **Explicit heap with permissions** (Viper style): heap as maps in obligations, `acc(p.f)` permissions, frame rules | One uniform model from day one; directly supports regions, raw pointers, sharing | Every obligation carries heap terms and framing; larger proofs; needs heap/map axioms in the kernel or the obligation generator |
+| **Defer** | Nothing to decide now | Phase-2 encoding becomes a de facto choice made by accident |
+
+> **Evidence (agent's view):** value-level obligations are what agents and SMT solvers handle best; heap terms are where Dafny/Viper proofs most often need manual frame hints. The second-class reference rules in phase 1 make the value-level option exact today, which favors starting there and adding explicit permissions only where values cannot express ownership.

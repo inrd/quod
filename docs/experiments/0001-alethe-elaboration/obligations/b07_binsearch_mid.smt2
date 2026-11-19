@@ -1,0 +1,6 @@
+(set-logic ALL)
+; mid = lo + (hi - lo) / 2 stays in [lo, hi)
+(declare-const lo Int)(declare-const hi Int)
+(assert (and (<= 0 lo) (< lo hi)))
+(assert (not (and (<= lo (+ lo (div (- hi lo) 2))) (< (+ lo (div (- hi lo) 2)) hi))))
+(check-sat)

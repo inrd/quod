@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const h Int)(declare-const l Int)
+(assert (and (<= 0 h) (< h 16) (<= 0 l) (<= l 16)))
+(assert (not (and (<= 0 (mod (+ h l) 16)) (< (mod (+ h l) 16) 16))))
+(check-sat)
