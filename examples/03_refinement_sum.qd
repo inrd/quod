@@ -1,0 +1,51 @@
+// PROVISIONAL SYNTAX — non-normative sketch. Nothing here is accepted design.
+// Phase 6: a human-reviewed reference (`spec fn`) and an agent-optimized
+// implementation proven equivalent to it (`refines`). Phase 7: resource contract.
+
+// Reference: what a human reviews. Pure, total, may be non-executable.
+// Returns a mathematical `int` (ADR-0002): no overflow can occur in the spec.
+// `add` must be a named spec fn: the kernel defunctionalizes `fold(xs, 0, add)`
+// into a first-order symbol with its own definition (ADR-0003).
+spec fn add(acc: int, x: i64) -> int = acc + x
+spec fn sum(xs: &[i64]) -> int = fold(xs, 0, add)
+
+// Optimized: what an agent writes. `?h1` is a typed hole; the oracle reports
+// its type (i128), allowed effects ({}), and obligations (refines sum, cost bound).
+// The refinement obligation compares mathematical values: int(result) == sum(xs).
+impl fn sum_fast(xs: &[i64]) -> i128
+    refines sum
+    effects {}
+    cost <= xs.len / 4 + 16
+{ ?h1 }
+
+// One possible filling of ?h1 (still provisional): four independent accumulators.
+impl fn sum_unrolled(xs: &[i64]) -> i128
+    refines sum
+    effects {}
+    cost <= xs.len / 4 + 16
+{
+    let n: usize = xs.len;
+    let q: usize = n / 4usize;
+    let mut a0: i128 = 0; let mut a1: i128 = 0;
+    let mut a2: i128 = 0; let mut a3: i128 = 0;
+    for k: usize in 0usize..q
+        invariant a0 + a1 + a2 + a3 == sum(xs[0usize..(4usize * k)])
+        decreases q - k
+    {
+        let b: usize = 4usize * k;
+        a0 += xs[b] as i128;                 // i64 -> i128 widening: total, no precondition
+        a1 += xs[b + 1usize] as i128;        // proven: |acc| <= 2^63 * n < 2^127, no overflow
+        a2 += xs[b + 2usize] as i128;
+        a3 += xs[b + 3usize] as i128;
+    }
+    let mut tail: i128 = 0;
+    for j: usize in (4usize * q)..n
+        invariant tail == sum(xs[(4usize * q)..j])
+        decreases n - j
+    {
+        tail += xs[j] as i128;
+    }
+    // Redundant assertion as a consistency check on the agent's reasoning.
+    assert (a0 + a1 + a2 + a3) + tail == sum(xs);
+    return ((a0 + a1) + (a2 + a3)) + tail;
+}

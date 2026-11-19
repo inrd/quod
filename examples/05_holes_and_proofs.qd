@@ -1,0 +1,52 @@
+// PROVISIONAL SYNTAX — non-normative sketch. Nothing here is accepted design.
+// Phases 2–3: typed holes for the agent loop, and an explicit proof artifact.
+// Proofs are flat Alethe-subset step lists checked by the kernel (ADR-0003);
+// the concrete `proof` block syntax in source is still provisional.
+
+// Binary search: spec written first, body and invariants left as holes.
+pub fn find(xs: &[u32], key: u32) -> Option<usize>
+    effects {}
+    requires forall i: usize, j: usize. i < j && j < xs.len => xs[i] <= xs[j]   // sorted
+    ensures  some(result) => unwrap(result) < xs.len && xs[unwrap(result)] == key
+    ensures  none(result) => forall i: usize. i < xs.len => xs[i] != key
+{
+    let mut lo: usize = 0usize;
+    let mut hi: usize = xs.len;
+    while lo < hi
+        invariant ?inv1                     // hole kind: loop-invariant
+        decreases ?m1                       // hole kind: measure
+    {
+        let mid: usize = lo + ((hi - lo) / 2usize);   // not (lo + hi) / 2: overflow obligation
+        if xs[mid] == key { return Some(mid); }
+        if xs[mid] < key { lo = mid + 1usize; } else { hi = mid; }
+    }
+    return None;
+}
+
+// Agent workflow (see docs/oracle-protocol.md):
+//   1. obligations/list   -> ob:find/loop0/invariant-init, …/preserve, …/termination, ensures#0, ensures#1
+//   2. hole/info ?inv1    -> expected: bool over {lo, hi, xs, key}; must imply ensures#1 at exit
+//   3. agent proposes:      lo <= hi && hi <= xs.len
+//                           && (forall i. i < lo => xs[i] < key)
+//                           && (forall i. hi <= i && i < xs.len => xs[i] > key)
+//   4. hole/info ?m1      -> expected: a value of a well-founded type; agent proposes: hi - lo
+//   5. check/counterexample on any failing obligation, repair, repeat
+//   6. proof/submit for each obligation; kernel accepts or rejects deterministically
+
+// A standalone lemma with an explicit proof artifact (ADR-0003).
+// Spec context: the arithmetic below is on mathematical ints (ADR-0002).
+lemma mid_in_range(lo: usize, hi: usize)
+    requires lo < hi
+    ensures  lo <= lo + ((hi - lo) / 2) && lo + ((hi - lo) / 2) < hi
+proof {
+    // Refutation of the negated goal, ending in the empty clause. Typically produced
+    // by cvc5 + the untrusted elaborator, stored with the source, keyed by
+    // obligation ID + fingerprint. Sketch only (steps elided, terms abbreviated):
+    //
+    // (assume h1 (< lo hi))                                  ; hypothesis, built by kernel
+    // (assume h2 (not (and (<= lo m) (< m hi))))             ; negated goal, m = lo + (hi-lo) div 2
+    // (step t1 (cl (<= (* 2 (- m lo)) (- hi lo))) :rule qd_int_cut ...)
+    // ...
+    // (step t9 (cl) :rule la_generic :premises (h1 t1 ...) :args (1 1 ...))  ; Farkas coefficients
+    ?p1
+}

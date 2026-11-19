@@ -1,0 +1,42 @@
+// PROVISIONAL SYNTAX — non-normative sketch. Nothing here is accepted design.
+// Phase 2: type invariants, contracts, old(), proven bounds (no runtime checks).
+
+type Ring<T, const N: u32>
+    where N > 0                              // without this, `% N` is a division-by-zero obligation
+{
+    data: [T; N],
+    head: u32 where head < N,
+    len:  u32 where len <= N,
+}
+
+type Full {}
+
+pub fn push(rb: &mut Ring<f32, N>, x: f32) -> Result<(), Full>
+    effects {}
+    ensures ok(result)  => rb.len == old(rb.len) + 1
+    ensures err(result) => rb.len == old(rb.len) && old(rb.len) == N
+    ensures rb.head == old(rb.head)          // redundant-but-useful: push never moves head
+{
+    if rb.len == N { return Err(Full.{}); }
+    // Facts: head < N, len < N  =>  head + len < 2N  (no u32 overflow needs N <= 2^31; see below)
+    let i: u32 = (rb.head + rb.len) % N;     // proven i < N: no bounds check emitted
+    rb.data[i] = x;
+    rb.len += 1;                             // proven len + 1 <= N: invariant preserved
+    return Ok(());
+}
+
+// Open: `rb.head + rb.len` can overflow u32 if N > 2^31. Either add `where N <= 2147483648`
+// to Ring, or compute the index with a proven-safe form. The oracle would report this as
+// obligation ob:ring::push/body/stmt1/overflow with a counterexample N = 2^32 - 1.
+
+pub fn pop(rb: &mut Ring<f32, N>) -> Option<f32>
+    effects {}
+    ensures some(result) => rb.len == old(rb.len) - 1
+    ensures none(result) => old(rb.len) == 0
+{
+    if rb.len == 0 { return None; }
+    let x: f32 = rb.data[rb.head];
+    rb.head = (rb.head + 1) % N;
+    rb.len -= 1;
+    return Some(x);
+}

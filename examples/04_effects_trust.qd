@@ -1,0 +1,55 @@
+// PROVISIONAL SYNTAX — non-normative sketch. Nothing here is accepted design.
+// Phases 4–5: effects, capabilities, regions, and `trust` axioms with provenance.
+
+// FFI: an axiom about external code. Unproven; listed in the trust report.
+trust fn c_write(fd: i32, buf: &[u8]) -> isize
+    effects { io, unsafe }
+    ensures result <= buf.len               // spec context: compared as mathematical ints (ADR-0002)
+    provenance "POSIX write(2); IEEE Std 1003.1-2017"
+
+// A capability value: holding `Stdout` is the authority to write to stdout.
+type Stdout { fd: i32 where fd == 1 }
+
+pub fn log_line(out: &Stdout, msg: &[u8]) -> Result<(), IoError>
+    effects { io, unsafe }                  // must include every callee effect
+{
+    let n: isize = c_write(out.fd, msg);
+    if n < 0 { return Err(IoError.{ code: n }); }
+    return Ok(());
+}
+
+// Pure function: cannot call log_line (it lacks `io`). This is a compile error:
+//
+// fn checksum(xs: &[u8]) -> u32
+//     effects {}
+// {
+//     log_line(?out, xs);   // E04xx: callee requires effects { io, unsafe }
+//     ...
+// }
+
+// Region allocation: `alloc` is an effect; the region is a capability.
+pub fn build_table(r: &mut Region, n: u32) -> Result<&mut [u32], OutOfMemory>
+    effects { alloc }
+    requires n <= 65536
+    ensures ok(result) => unwrap(result).len == n
+    mem <= n * 4                            // exact int arithmetic, no casts needed in specs
+{
+    let t: &mut [u32] = r.alloc_array::<u32>(n as usize)?;   // `?` is provisional
+    for i: usize in 0usize..t.len
+        invariant forall j: usize. j < i => t[j] == (j as u32)
+        decreases t.len - i
+    {
+        t[i] = i as u32;                     // proven: i < n <= 65536 fits u32
+    }
+    return Ok(t);
+}
+
+// Steady-state code: no allocation, bounded stack. (Power of 10, rule 3.)
+pub fn lookup(t: &[u32], k: u32) -> u32
+    effects {}
+    noalloc
+    stack <= 64
+    requires (k as usize) < t.len
+{
+    return t[k as usize];
+}
