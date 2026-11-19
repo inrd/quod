@@ -1,0 +1,3 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0319
+fn f() -> () effects {} { let a: u8 = 1; let b: u8 = &a; }

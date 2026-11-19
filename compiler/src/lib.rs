@@ -6,11 +6,13 @@
 #![forbid(unsafe_code)]
 
 pub mod ast;
+pub mod check;
 pub mod diag;
 pub mod dump;
 pub mod fmt;
 pub mod lexer;
 pub mod parser;
+pub mod types;
 
 pub use diag::{Code, Diagnostic};
 

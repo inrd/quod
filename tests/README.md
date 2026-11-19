@@ -14,4 +14,6 @@ Each directory will hold `.qd` inputs with expected outputs (golden files) or ex
 
 Conventions (provisional): one case per file. Line 1 is the provisional-syntax header required for every `.qd` file; line 2 states the expected outcome (`// expect: ok`, `// expect: E0203`).
 
+`typecheck/` is run by `compiler/tests/typecheck.rs`: `ok` files have a third line `// traps: <kinds in source order>` (or `none`) checked against the unverified-checks report; every `E03xx` code needs at least one `err_E03xx*` file.
+
 `parse/` is run by `cargo test` (`compiler/tests/corpus.rs`). For `ok` cases it checks parse success, formatter idempotence, `parse(format(x)) == parse(x)`, and that the file is already canonical (unless its name contains `noncanonical`). For error cases it checks the first diagnostic's code.

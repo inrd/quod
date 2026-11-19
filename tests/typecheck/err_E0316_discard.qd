@@ -1,0 +1,4 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0316
+fn g() -> u8 effects {} { return 1; }
+fn f() -> () effects {} { g(); }

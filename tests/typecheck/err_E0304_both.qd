@@ -1,0 +1,3 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0304
+fn f() -> bool effects {} { return 1 < 2; }

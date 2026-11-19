@@ -11,8 +11,8 @@ Rust ([ADR-0001](../docs/adr/0001-implementation-language.md)), member of the Ca
 | `dump.rs` (span- and comment-free S-expression, used for AST equality) | yes | — |
 | `fmt.rs` (canonical formatter, keeps every comment) | yes | [format.md](../spec/format.md) |
 | `diag.rs` (stable codes) | yes | [diagnostics.md](../spec/diagnostics.md) |
-| Name resolution, type checker | no | [typing.md](../spec/typing.md) (draft) |
-| Runtime traps + "unverified checks" report | no | [typing.md §11](../spec/typing.md#11-runtime-traps-and-the-unverified-checks-report), [ADR-0002](../docs/adr/0002-arithmetic-semantics.md#phase-1-transition) |
+| `types.rs`, `check.rs` (name resolution, type checker) | yes | [typing.md](../spec/typing.md), [ADR-0004](../docs/adr/0004-phase-1-typing-choices.md) |
+| "Unverified checks" report (trap sites; emitting the traps is the C emitter's job) | yes | [typing.md §11](../spec/typing.md#11-runtime-traps-and-the-unverified-checks-report), [ADR-0002](../docs/adr/0002-arithmetic-semantics.md#phase-1-transition) |
 | C emitter | no | not yet written down |
 | Mechanical LL(1) check of the grammar | no | [grammar-draft §8](../spec/grammar-draft.md) |
 
@@ -21,6 +21,7 @@ Rust ([ADR-0001](../docs/adr/0001-implementation-language.md)), member of the Ca
 ```
 quodc fmt [--check | --write] <file>...
 quodc parse <file>
+quodc check <file>     # prints the unverified-checks report
 ```
 
 Exit codes: `0` ok, `1` diagnostics or non-canonical files, `2` usage or I/O error.

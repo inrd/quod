@@ -1,6 +1,6 @@
 # ADR-0004: Phase-1 typing choices
 
-- **Status:** Accepted
+- **Status:** Accepted; decision 1, second sentence, superseded by [ADR-0005](0005-portable-static-checks-for-pointer-sized-integers.md)
 - **Date:** 2026-11-19
 - **Deciders:** project maintainer (accepted 2026-11-19)
 - **Author:** Claude (agent), at the maintainer's request

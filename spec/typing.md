@@ -1,6 +1,6 @@
 # Name resolution and type checking — phase 1
 
-> **Status: draft, provisional, non-normative.** Syntax follows [grammar-draft.md](grammar-draft.md). Arithmetic semantics are from [ADR-0002](../docs/adr/0002-arithmetic-semantics.md) (accepted). The choices in [§14](#14-decided-points-adr-0004) are accepted by [ADR-0004](../docs/adr/0004-phase-1-typing-choices.md). Everything else is a proposal.
+> **Status: draft, provisional, non-normative.** Syntax follows [grammar-draft.md](grammar-draft.md). Arithmetic semantics are from [ADR-0002](../docs/adr/0002-arithmetic-semantics.md) (accepted). The choices in [§14](#14-decided-points-adr-0004) are accepted by [ADR-0004](../docs/adr/0004-phase-1-typing-choices.md); the `usize`/`isize` static-check rule (§4.1, §11) by [ADR-0005](../docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md). Everything else is a proposal.
 
 ## 1. Scope
 
@@ -72,7 +72,7 @@ When a check-mode expression synthesizes a type different from the expected one,
 
 - A **suffixed** literal synthesizes its suffix type.
 - An **unsuffixed** literal takes the expected type, which must be an integer type. With no expected type it is `E0304` ("add a suffix").
-- The literal's value must fit its type, checked statically (`E0305`), not trapped.
+- The literal's value must fit its type, checked statically (`E0305`), not trapped. Static checks use the range every target guarantees ([ADR-0005](../docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md)): `usize`/`isize` count as 32-bit. A constant that only fits on 64-bit targets (`4294967296usize`) is `E0305`; use `u64`.
 - **Negative literals:** unary `-` applied directly to an integer literal is folded first, and the negated value is range-checked. So `-128i8` is valid; `128i8` alone is `E0305`.
 
 ### 4.2 Binary operators without an expected type
@@ -193,15 +193,15 @@ These are ADR-0002 preconditions. In phase 1, each one that is not *statically t
 
 **Statically trivial** (no trap, no report entry) is defined syntactically, so the result is deterministic and the same for every agent:
 
-- every operand involved is an integer literal (after §4.1 negation folding) and the check passes; if it fails, it is a compile error (`E0305`);
-- the cast is widening: every value of the source type fits the target type. `usize`/`isize` count as 64-bit for this rule, so `u64 as usize` is not trivial;
-- `a[k]` where `a` is an array (not a slice) and `k` is a literal with `k < N`; with `k >= N` it is `E0305`.
+- every operand involved *in that check* is an integer literal (after §4.1 negation folding) and the check passes; if it fails, it is a compile error (`E0305`). Each check involves only the operands it reads: `div-zero` reads the divisor only (`x / 2` has no `div-zero` trap), the `<<` amount check reads the amount only, `div-overflow`, `overflow` and lost bits on `<<` read both operands;
+- the cast is widening on every target ([ADR-0005](../docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md)): every value the source can hold on any target (`usize`/`isize` as 64-bit) fits the range the target has on every target (`usize`/`isize` as 32-bit). So `u32 as usize` and `usize as u64` are trivial; `u64 as usize` and `usize as u32` are not;
+- `a[k]` where `a` is an array (not a slice) and `k` is a literal with `k < N`; with `k >= N` it is `E0305`. Likewise `&a[lo..hi]` with literal `lo <= hi <= N`.
 
 Nothing else is elided in phase 1: no flow facts, no constant propagation. Phase 2 replaces all of this with proof obligations.
 
 **Trap behavior:** the program terminates and does not return to the caller. It is not a `panic` effect ([ADR-0002](../docs/adr/0002-arithmetic-semantics.md#consequences)). The exact mechanism (e.g. `abort()` after a message naming the check) belongs to the C emitter spec.
 
-**Report:** one entry per trap site, in source order: `file:line:col`, enclosing function, kind (`overflow`, `negate`, `div-zero`, `div-overflow`, `shift`, `cast`, `bounds`, `slice`), operand type(s). It is plain text in phase 1, with a stable ordering suitable for diffing. Phase 3 adds a JSON form.
+**Report:** one entry per trap site and kind, in source order (`quodc check`): `file:line:col`, enclosing function, kind (`overflow`, `negate`, `div-zero`, `div-overflow`, `shift`, `cast`, `bounds`, `slice`), operand type(s). It is plain text in phase 1, with a stable ordering suitable for diffing. Phase 3 adds a JSON form.
 
 ## 12. Diagnostics
 
@@ -222,7 +222,7 @@ Accepted by the maintainer on 2026-11-19; rationale and alternatives in [ADR-000
 
 | # | Question | Decision |
 |---|---|---|
-| Q1 | Width of `usize`/`isize` | Target pointer width; counted as 64-bit for the trivial-cast rule (§11) |
+| Q1 | Width of `usize`/`isize` | Target pointer width; static checks per [ADR-0005](../docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md) (§4.1, §11) |
 | Q2 | Array → slice | Range slicing `&p[lo..hi]` / `&mut p[lo..hi]` (§8.3) |
 | Q3 | Implicit dereference | Exactly one level, for `.f`, `.len`, `[i]`, `[lo..hi]` only (§8.2) |
 | Q4 | Shift amount type | Same type as the left operand (§5) |

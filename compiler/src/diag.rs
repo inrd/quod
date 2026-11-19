@@ -43,6 +43,56 @@ pub enum Code {
     E0205,
     /// Construct not available in phase 1.
     E0206,
+    /// Unknown name.
+    E0301,
+    /// Duplicate definition or shadowing.
+    E0302,
+    /// Type mismatch.
+    E0303,
+    /// Unsuffixed literal or hole with no expected type.
+    E0304,
+    /// Constant out of range.
+    E0305,
+    /// Operator not defined for the operand type.
+    E0306,
+    /// Invalid cast.
+    E0307,
+    /// Not assignable.
+    E0308,
+    /// Wrong number of arguments.
+    E0309,
+    /// Call target is not a function.
+    E0310,
+    /// Unknown field.
+    E0311,
+    /// Struct literal fields missing, duplicated or out of order.
+    E0312,
+    /// Missing return.
+    E0313,
+    /// Unreachable statement.
+    E0314,
+    /// `break`/`continue` outside a loop.
+    E0315,
+    /// Expression statement is not a call returning `()`.
+    E0316,
+    /// Recursion (phase 1).
+    E0317,
+    /// Construct not available in phase 1.
+    E0318,
+    /// Reference outside a parameter type or call argument.
+    E0319,
+    /// `&mut` argument aliases another argument.
+    E0320,
+    /// Unfilled hole.
+    E0321,
+    /// Invalid array length.
+    E0322,
+    /// Array literal length mismatch.
+    E0323,
+    /// Struct contains itself by value.
+    E0324,
+    /// Range index not directly under `&`/`&mut`.
+    E0325,
 }
 
 impl Code {
@@ -57,6 +107,31 @@ impl Code {
             Code::E0204 => "E0204",
             Code::E0205 => "E0205",
             Code::E0206 => "E0206",
+            Code::E0301 => "E0301",
+            Code::E0302 => "E0302",
+            Code::E0303 => "E0303",
+            Code::E0304 => "E0304",
+            Code::E0305 => "E0305",
+            Code::E0306 => "E0306",
+            Code::E0307 => "E0307",
+            Code::E0308 => "E0308",
+            Code::E0309 => "E0309",
+            Code::E0310 => "E0310",
+            Code::E0311 => "E0311",
+            Code::E0312 => "E0312",
+            Code::E0313 => "E0313",
+            Code::E0314 => "E0314",
+            Code::E0315 => "E0315",
+            Code::E0316 => "E0316",
+            Code::E0317 => "E0317",
+            Code::E0318 => "E0318",
+            Code::E0319 => "E0319",
+            Code::E0320 => "E0320",
+            Code::E0321 => "E0321",
+            Code::E0322 => "E0322",
+            Code::E0323 => "E0323",
+            Code::E0324 => "E0324",
+            Code::E0325 => "E0325",
         }
     }
 }

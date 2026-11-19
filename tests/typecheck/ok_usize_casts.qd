@@ -1,0 +1,20 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: cast cast cast cast cast cast
+
+// ADR-0005: casts skip the check only when they widen on every target.
+fn casts(a: u32, b: usize, c: u64, d: i32, e: isize, f: i64, g: u16) -> ()
+    effects {}
+{
+    let a1: usize = a as usize;
+    let b1: u64 = b as u64;
+    let c1: usize = c as usize;
+    let b2: u32 = b as u32;
+    let d1: isize = d as isize;
+    let e1: i64 = e as i64;
+    let f1: isize = f as isize;
+    let g1: isize = g as isize;
+    let a2: isize = a as isize;
+    let b3: isize = b as isize;
+    let e2: usize = e as usize;
+}

@@ -1,0 +1,32 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: bounds bounds bounds cast
+
+type Stats {
+    min: i32,
+    max: i32,
+    count: u32,
+}
+
+pub fn stats(xs: &[i32]) -> Stats
+    effects {}
+{
+    if xs.len == 0usize {
+        return Stats.{ min: 0, max: 0, count: 0 };
+    }
+    let mut lo: i32 = xs[0usize];
+    let mut hi: i32 = xs[0usize];
+    for i: usize in 1usize..xs.len {
+        let v: i32 = xs[i];
+        if v < lo {
+            lo = v;
+        }
+        if v > hi {
+            hi = v;
+        }
+    }
+    if xs.len > 4294967295usize {
+        return Stats.{ min: lo, max: hi, count: 4294967295u32 };
+    }
+    return Stats.{ min: lo, max: hi, count: xs.len as u32 };
+}

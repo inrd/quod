@@ -1,0 +1,39 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: bounds
+
+type Point {
+    x: i32,
+    y: i32,
+}
+
+fn origin(p: &mut Point) -> ()
+    effects {}
+{
+    p.x = 0;
+    p.y = 0;
+}
+
+fn total(xs: &[u32], pt: &Point) -> u32
+    effects {}
+{
+    let first: u32 = xs[0usize];
+    let px: i32 = pt.x;
+    return first;
+}
+
+fn caller() -> u32
+    effects {}
+{
+    let mut pt: Point = Point.{ x: 1, y: 2 };
+    let arr: [u32; 4] = [1, 2, 3, 4];
+    origin(&mut pt);
+    let k: u32 = arr[3usize];
+    return total(&arr[0usize..4usize], &pt);
+}
+
+fn pass_on(xs: &[u32], pt: &Point) -> u32
+    effects {}
+{
+    return total(xs, pt);
+}

@@ -10,6 +10,7 @@ commands:
                                       --check: list non-canonical files, exit 1 if any
                                       --write: rewrite files in place
   parse <file>                        print the AST as an S-expression
+  check <file>                        type-check; print the unverified-checks report
 ";
 
 fn main() -> ExitCode {
@@ -21,6 +22,7 @@ fn main() -> ExitCode {
     match cmd.as_str() {
         "fmt" => fmt(rest),
         "parse" => parse(rest),
+        "check" => check(rest),
         "-h" | "--help" | "help" => {
             print!("{USAGE}");
             ExitCode::SUCCESS
@@ -103,6 +105,31 @@ fn parse(args: &[String]) -> ExitCode {
     match quodc::parser::parse(&src) {
         Ok(file) => {
             print!("{}", quodc::dump::dump(&file));
+            ExitCode::SUCCESS
+        }
+        Err(d) => {
+            eprintln!("{}", d.render(path, &src));
+            ExitCode::from(1)
+        }
+    }
+}
+
+fn check(args: &[String]) -> ExitCode {
+    let [path] = args else {
+        eprint!("{USAGE}");
+        return ExitCode::from(2);
+    };
+    let src = match read(path) {
+        Ok(s) => s,
+        Err(code) => return code,
+    };
+    let result = quodc::parser::parse(&src).and_then(|f| quodc::check::check(&f));
+    match result {
+        Ok(checked) => {
+            print!(
+                "{}",
+                quodc::check::render_report(path, &src, &checked.traps)
+            );
             ExitCode::SUCCESS
         }
         Err(d) => {

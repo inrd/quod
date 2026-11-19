@@ -1,0 +1,23 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: none
+
+fn lits() -> i64
+    effects {}
+{
+    let a: i8 = -128i8;
+    let b: i8 = -128;
+    let c: u8 = 1u8 + 2u8;
+    let d: u32 = 7;
+    let e: u64 = d as u64;
+    let f: usize = 4294967295;
+    let g: u64 = f as u64;
+    let h: i32 = 10 / 3;
+    let k: u32 = 1u32 << 31u32;
+    let m: bool = a < b && c != 3;
+    let n: u16 = 300u32 as u16;
+    let arr: [u8; 3] = [1, 2, 3];
+    let x: u8 = arr[2];
+    let y: i64 = (-5i32) as i64;
+    return y;
+}

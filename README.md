@@ -8,7 +8,7 @@ It is meant as a C alternative: a low-level, high-performance primitive with **n
 |---|---|
 | Compiler | `quodc` |
 | Source extension | `.qd` |
-| Status | **Phase 1 in progress.** Core decisions accepted ([ADR-0001–0003](docs/adr/README.md)). `quodc` has a lexer, parser and canonical formatter; no type checker or C emitter yet. All syntax is provisional. |
+| Status | **Phase 1 in progress.** Core decisions accepted ([ADR-0001–0003](docs/adr/README.md)). `quodc` parses, formats and type-checks the phase-1 core; no C emitter yet. All syntax is provisional. |
 
 ## The idea in four lines
 
@@ -39,10 +39,10 @@ docs/          design documents (start with vision.md)
 docs/adr/      architecture decision records
 spec/          language specification drafts (grammar, format, diagnostics)
 examples/      provisional syntax sketches (.qd)
-compiler/      quodc: lexer, parser, formatter        (phase 1, in progress)
+compiler/      quodc: parser, formatter, type checker (phase 1, in progress)
 kernel/        trusted proof checker                  (empty: phase 2)
 oracle/        JSON query server for agents           (empty: phase 3)
-tests/         test corpus (parse/ populated)
+tests/         test corpus (parse/, typecheck/ populated)
 ```
 
 ## Reading order
@@ -60,7 +60,7 @@ Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs
 ```
 cargo build
 cargo test
-./target/debug/quodc fmt examples/01_core_max.qd
+./target/debug/quodc check examples/01_core_max.qd
 ```
 
 ## License

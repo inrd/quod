@@ -1,0 +1,4 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0324
+type A { b: B }
+type B { a: [A; 2] }

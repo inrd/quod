@@ -1,6 +1,6 @@
 # CLAUDE.md — working in the Quod repository
 
-Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser and canonical formatter; type checker and C emitter are not written yet.
+Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser, canonical formatter and type checker (with the unverified-checks report); the C emitter is not written yet.
 
 ## Accepted decisions
 
@@ -10,6 +10,7 @@ Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Ph
 | [0002](docs/adr/0002-arithmetic-semantics.md) | Mathematical integers in spec contexts; checked machine integers in code; runtime traps during phase 1 only |
 | [0003](docs/adr/0003-kernel-logic-and-proof-format.md) | Many-sorted first-order kernel logic; flat proofs in a strict Alethe subset plus Quod rules |
 | [0004](docs/adr/0004-phase-1-typing-choices.md) | Phase-1 typing: pointer-width `usize`, `&p[lo..hi]` slicing, one-level implicit deref, same-type shifts, ordered struct literals, no dead code/recursion/modules |
+| [0005](docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md) | Static checks treat `usize`/`isize` conservatively: values may need 64 bits, stored values must fit 32 bits; target-independent |
 
 Read the relevant ADR before working on the area it covers.
 
@@ -33,9 +34,9 @@ Read the relevant ADR before working on the area it covers.
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
 | `Cargo.toml` | Workspace root; members: `compiler` |
 | `examples/*.qd` | Provisional syntax sketches |
-| `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, CLI |
+| `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, CLI |
 | `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
-| `tests/` | `.qd` test corpus; `parse/` is run by `compiler/tests/corpus.rs` |
+| `tests/` | `.qd` test corpus; `parse/` and `typecheck/` are run by `compiler/tests/` |
 
 ## Workflow: docs first, decisions as ADRs
 

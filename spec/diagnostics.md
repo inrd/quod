@@ -8,7 +8,7 @@ Format: `E` + 4 digits. The first two digits name the stage.
 |---|---|
 | `E01xx` | lexer |
 | `E02xx` | parser |
-| `E03xx` | name resolution and type checking ([typing.md](typing.md); not yet implemented) |
+| `E03xx` | name resolution and type checking ([typing.md](typing.md)) |
 | `E04xx` | C emission (not yet assigned) |
 
 Phase 1 stops at the first error in each file (no recovery).
@@ -34,7 +34,7 @@ Phase 1 stops at the first error in each file (no recovery).
 
 ## Type checker
 
-Proposed with [typing.md](typing.md); not yet implemented.
+Specified in [typing.md](typing.md); implemented in `compiler/src/check.rs`.
 
 | Code | Meaning |
 |---|---|

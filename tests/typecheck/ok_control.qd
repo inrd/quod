@@ -1,0 +1,47 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: none
+
+fn sign(x: i32) -> i32
+    effects {}
+{
+    if x < 0 {
+        return -1;
+    } else if x == 0 {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+fn loops(n: u8) -> ()
+    effects {}
+{
+    for i: u8 in 0..n {
+        if i == 3 {
+            continue;
+        }
+        if i == 5 {
+            break;
+        }
+        {
+            let j: u8 = i;
+        }
+        let j: u8 = i;
+    }
+    for i: u8 in 0..n {
+        noop();
+    }
+}
+
+fn noop() -> ()
+    effects {}
+{}
+
+fn nested() -> bool
+    effects {}
+{
+    {
+        return true;
+    }
+}
