@@ -633,6 +633,16 @@ impl Parser {
         let op = match self.peek() {
             TokKind::Punct(Punct::Minus) => UnOp::Neg,
             TokKind::Punct(Punct::Bang) => UnOp::Not,
+            TokKind::Punct(Punct::Amp) => {
+                let start = self.bump().span;
+                let mutable = self.eat_kw(Kw::Mut);
+                let e = self.unary()?;
+                let span = start.to(e.span);
+                return Ok(Expr {
+                    kind: ExprKind::Ref(mutable, Box::new(e)),
+                    span,
+                });
+            }
             _ => return self.cast_expr(),
         };
         let start = self.bump().span;
@@ -673,12 +683,18 @@ impl Parser {
                 TokKind::Punct(Punct::LBracket) => {
                     self.bump();
                     let i = self.expr()?;
+                    let hi = if self.eat(Punct::DotDot) {
+                        Some(self.expr()?)
+                    } else {
+                        None
+                    };
                     let end = self.expect(Punct::RBracket)?;
                     let span = e.span.to(end);
-                    e = Expr {
-                        kind: ExprKind::Index(Box::new(e), Box::new(i)),
-                        span,
+                    let kind = match hi {
+                        None => ExprKind::Index(Box::new(e), Box::new(i)),
+                        Some(hi) => ExprKind::Slice(Box::new(e), Box::new(i), Box::new(hi)),
                     };
+                    e = Expr { kind, span };
                 }
                 TokKind::Punct(Punct::LParen) => {
                     self.bump();

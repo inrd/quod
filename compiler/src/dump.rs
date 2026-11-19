@@ -187,6 +187,8 @@ fn expr(e: &Expr) -> String {
         ExprKind::Array(es) => list("array", es.iter().map(expr)),
         ExprKind::Field(b, f) => list("field", [expr(b), f.name.clone()]),
         ExprKind::Index(b, i) => list("index", [expr(b), expr(i)]),
+        ExprKind::Slice(b, lo, hi) => list("slice", [expr(b), expr(lo), expr(hi)]),
+        ExprKind::Ref(m, b) => list(if *m { "ref-mut" } else { "ref" }, [expr(b)]),
         ExprKind::Call(f, args) => list(
             "call",
             std::iter::once(expr(f)).chain(args.iter().map(expr)),

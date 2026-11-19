@@ -8,7 +8,7 @@ Format: `E` + 4 digits. The first two digits name the stage.
 |---|---|
 | `E01xx` | lexer |
 | `E02xx` | parser |
-| `E03xx` | name resolution and type checking (not yet assigned) |
+| `E03xx` | name resolution and type checking ([typing.md](typing.md); not yet implemented) |
 | `E04xx` | C emission (not yet assigned) |
 
 Phase 1 stops at the first error in each file (no recovery).
@@ -31,3 +31,35 @@ Phase 1 stops at the first error in each file (no recovery).
 | `E0204` | Chained comparison (`a < b < c`). |
 | `E0205` | `&&` and `\|\|` mixed without parentheses. |
 | `E0206` | Keyword valid but construct not available in phase 1 (e.g. `while`). |
+
+## Type checker
+
+Proposed with [typing.md](typing.md); not yet implemented.
+
+| Code | Meaning |
+|---|---|
+| `E0301` | Unknown name (type, function or local). |
+| `E0302` | Duplicate definition or shadowing (item, built-in type name, field, parameter, local). |
+| `E0303` | Type mismatch. |
+| `E0304` | Unsuffixed integer literal (or hole) with no expected type. |
+| `E0305` | Constant out of range: literal does not fit its type, or a statically trivial check fails (literal index ≥ `N`, literal overflow). |
+| `E0306` | Operator not defined for the operand type (e.g. `-` on unsigned, `<` on `bool`, `&` on `bool`, indexing a non-array). |
+| `E0307` | Invalid cast (`as` with a non-integer type). |
+| `E0308` | Not assignable (immutable local, parameter, `for` variable, `.len`, through `&`). |
+| `E0309` | Wrong number of arguments. |
+| `E0310` | Call target is not a function. |
+| `E0311` | Unknown field. |
+| `E0312` | Struct literal fields missing, duplicated or out of declaration order. |
+| `E0313` | Missing return on some path. |
+| `E0314` | Unreachable statement. |
+| `E0315` | `break`/`continue` outside a loop. |
+| `E0316` | Expression statement is not a call returning `()`. |
+| `E0317` | Recursion (not available in phase 1). |
+| `E0318` | Construct not available in phase 1 (generics, `mod`/`use`, non-empty effects, `int`/`nat`, named array length). |
+| `E0319` | Reference type outside a parameter type. |
+| `E0320` | `&mut` argument aliases another argument of the same call. |
+| `E0321` | Unfilled hole. |
+| `E0322` | Invalid array length (zero, too large, or non-`usize` suffix). |
+| `E0323` | Array literal length does not match the expected type. |
+| `E0324` | Struct contains itself by value. |
+| `E0325` | Range index `p[lo..hi]` not directly under `&`/`&mut`. |

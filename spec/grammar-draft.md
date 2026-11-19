@@ -125,9 +125,12 @@ cmp_expr    = arith_expr [ cmp_op arith_expr ] ;          (* non-associative *)
 cmp_op      = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
 arith_expr  = unary { arith_op unary } ;                  (* single operator kind per chain, see §6 *)
 arith_op    = "+" | "-" | "*" | "/" | "%" | "&" | "|" | "^" | "<<" | ">>" ;
-unary       = ( "-" | "!" ) unary | cast_expr ;
+unary       = ( "-" | "!" ) unary
+            | "&" [ "mut" ] unary                         (* reference argument, typing.md §8 *)
+            | cast_expr ;
 cast_expr   = postfix [ "as" IDENT ] ;                    (* target: scalar type name *)
-postfix     = primary { "." IDENT | "[" expr "]" | "(" [ args ] ")" } ;
+postfix     = primary { "." IDENT | index | "(" [ args ] ")" } ;
+index       = "[" expr ( "]" | ".." expr "]" ) ;            (* e[i] or e[lo..hi] *)
 args        = expr { "," expr } ;
 primary     = INT_LIT | "true" | "false" | HOLE
             | expr_path [ struct_lit ]
@@ -143,6 +146,7 @@ field_init  = IDENT ":" expr ;
 
 Notes:
 - **Cast targets are a scalar type name** (`x as u32`), not a full `type`. With `as type`, `x as T < y` would need more than one token to decide between generic arguments and a comparison. Casts only apply to integer types, so nothing is lost.
+- **References and slices** ([ADR-0004](../docs/adr/0004-phase-1-typing-choices.md), [typing.md §8](typing.md#8-references-and-slices-phase-1-subset)): `&p`, `&mut p` and `&p[lo..hi]`. The grammar accepts them anywhere; the type checker restricts them to call arguments. `&&x` is a syntax error (the lexer produces `&&`); write `&(&x)` if ever needed.
 - **Unit value** `()` is a primary, so `-> ()` functions can `return ();`.
 - **`>>` and `>=` inside generic arguments** are split by the parser when it expects `>` (`Ring<Box<u8>>`). This is a lexer/parser interface detail, not an LL(1) conflict.
 - **Struct literals** use `Name.{ f: e }` (provisional). The leading `.` avoids the Rust/C ambiguity between `if x { … }` and `if Point { … }` while staying LL(1).
@@ -200,3 +204,4 @@ To verify mechanically in phase 1 (e.g. with a grammar tool):
 - [ ] `cast_expr`: `as type` followed by `<` is ambiguous (generic args vs comparison). Restricted to `as IDENT` (§5).
 - [ ] `expr_stmt` tail decided by one token.
 - [ ] `bracket_type` factored.
+- [ ] `index`: after `[ expr`, one token decides `]` or `..`.

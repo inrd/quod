@@ -9,6 +9,7 @@ Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Ph
 | [0001](docs/adr/0001-implementation-language.md) | Rust for compiler, oracle and kernel; kernel is an isolated crate with strict constraints |
 | [0002](docs/adr/0002-arithmetic-semantics.md) | Mathematical integers in spec contexts; checked machine integers in code; runtime traps during phase 1 only |
 | [0003](docs/adr/0003-kernel-logic-and-proof-format.md) | Many-sorted first-order kernel logic; flat proofs in a strict Alethe subset plus Quod rules |
+| [0004](docs/adr/0004-phase-1-typing-choices.md) | Phase-1 typing: pointer-width `usize`, `&p[lo..hi]` slicing, one-level implicit deref, same-type shifts, ordered struct literals, no dead code/recursion/modules |
 
 Read the relevant ADR before working on the area it covers.
 
@@ -27,6 +28,7 @@ Read the relevant ADR before working on the area it covers.
 | `docs/prior-art.md` | What to take or avoid from related systems |
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
+| `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
 | `Cargo.toml` | Workspace root; members: `compiler` |

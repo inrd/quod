@@ -1,0 +1,10 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+
+fn f(a: [u8; 4], buf: &mut [u8]) -> ()
+    effects {}
+{
+    let n: usize = sum(&a[0usize..a.len]);
+    fill(&mut buf[1usize..n], 0u8);
+    g(&a, &mut x, & &y, &mut a[0usize]);
+}

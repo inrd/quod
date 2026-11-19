@@ -288,6 +288,10 @@ pub enum ExprKind {
     Array(Vec<Expr>),
     Field(Box<Expr>, Ident),
     Index(Box<Expr>, Box<Expr>),
+    /// `e[lo..hi]`; valid only under `&`/`&mut` (checked by the type checker).
+    Slice(Box<Expr>, Box<Expr>, Box<Expr>),
+    /// `&e` (`false`) or `&mut e` (`true`).
+    Ref(bool, Box<Expr>),
     Call(Box<Expr>, Vec<Expr>),
     Cast(Box<Expr>, Ident),
     Unary(UnOp, Box<Expr>),

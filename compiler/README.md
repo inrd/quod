@@ -11,8 +11,8 @@ Rust ([ADR-0001](../docs/adr/0001-implementation-language.md)), member of the Ca
 | `dump.rs` (span- and comment-free S-expression, used for AST equality) | yes | — |
 | `fmt.rs` (canonical formatter, keeps every comment) | yes | [format.md](../spec/format.md) |
 | `diag.rs` (stable codes) | yes | [diagnostics.md](../spec/diagnostics.md) |
-| Name resolution, type checker | no | not yet written down |
-| Runtime traps + "unverified checks" report | no | [ADR-0002](../docs/adr/0002-arithmetic-semantics.md#phase-1-transition) |
+| Name resolution, type checker | no | [typing.md](../spec/typing.md) (draft) |
+| Runtime traps + "unverified checks" report | no | [typing.md §11](../spec/typing.md#11-runtime-traps-and-the-unverified-checks-report), [ADR-0002](../docs/adr/0002-arithmetic-semantics.md#phase-1-transition) |
 | C emitter | no | not yet written down |
 | Mechanical LL(1) check of the grammar | no | [grammar-draft §8](../spec/grammar-draft.md) |
 

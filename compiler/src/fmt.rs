@@ -281,6 +281,18 @@ pub fn expr(e: &Expr) -> String {
         ExprKind::Array(es) => format!("[{}]", join(es.iter().map(expr))),
         ExprKind::Field(b, f) => format!("{}.{}", expr(b), f.name),
         ExprKind::Index(b, i) => format!("{}[{}]", expr(b), expr(i)),
+        ExprKind::Slice(b, lo, hi) => format!("{}[{}..{}]", expr(b), expr(lo), expr(hi)),
+        ExprKind::Ref(mutable, b) => {
+            let inner = expr(b);
+            if *mutable {
+                format!("&mut {inner}")
+            } else if inner.starts_with('&') {
+                // `&&` would lex as one token.
+                format!("& {inner}")
+            } else {
+                format!("&{inner}")
+            }
+        }
         ExprKind::Call(f, args) => format!("{}({})", expr(f), join(args.iter().map(expr))),
         ExprKind::Cast(b, t) => format!("{} as {}", expr(b), t.name),
         ExprKind::Unary(op, b) => format!("{}{}", op.as_str(), expr(b)),

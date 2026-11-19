@@ -17,6 +17,7 @@ The formatter defines layout; whitespace is not significant to the AST. Required
 | Expressions | always on one line (no width-based wrapping in phase 1); binary operators surrounded by one space; no space inside `()`/`[]`; range `a..b` without spaces |
 | Struct literal | `Name.{ f: e, g: e }`; `Name.{}` is not valid (at least one field) |
 | Array literal | `[a, b, c]` |
+| References, slices | `&x`, `&mut x`, `& &x` (space keeps `&&` from lexing as one token), `a[lo..hi]` without spaces |
 | Effects | `effects {}` or `effects { a, b }` |
 | Parentheses | kept as written; the formatter never adds or removes them |
 | Integer literals | kept as written (base, underscores, suffix) |
