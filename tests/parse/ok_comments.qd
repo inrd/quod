@@ -1,0 +1,19 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+
+// detached header comment
+
+// attached to f
+fn f() -> ()
+    effects {}
+{
+    // leading in block
+    x = 1; // trailing on stmt
+    if c {
+        y = 2;
+        // before closing brace
+    } // after if
+    // end of body
+}
+
+// end of file

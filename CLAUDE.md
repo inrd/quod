@@ -1,6 +1,6 @@
 # CLAUDE.md — working in the Quod repository
 
-Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) may start**. There is no compiler yet.
+Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser and canonical formatter; type checker and C emitter are not written yet.
 
 ## Accepted decisions
 
@@ -27,8 +27,13 @@ Read the relevant ADR before working on the area it covers.
 | `docs/prior-art.md` | What to take or avoid from related systems |
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
+| `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
+| `spec/diagnostics.md` | Diagnostic code registry (provisional) |
+| `Cargo.toml` | Workspace root; members: `compiler` |
 | `examples/*.qd` | Provisional syntax sketches |
-| `compiler/`, `kernel/`, `oracle/`, `tests/` | Empty skeletons, each with a README stating its future scope |
+| `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, CLI |
+| `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
+| `tests/` | `.qd` test corpus; `parse/` is run by `compiler/tests/corpus.rs` |
 
 ## Workflow: docs first, decisions as ADRs
 
@@ -42,6 +47,9 @@ Read the relevant ADR before working on the area it covers.
 4. **Code follows the roadmap phase.** All implementation code is Rust ([ADR-0001](docs/adr/0001-implementation-language.md)). Only write code for the current roadmap phase (now: phase 1), and only for designs already written down in `docs/` or `spec/`.
 
 ## Rust and kernel rules (ADR-0001)
+
+- Before finishing a change: `cargo fmt --all --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`.
+- New diagnostics get a new code in `spec/diagnostics.md` and `compiler/src/diag.rs`; never reuse or renumber a code.
 
 - One Cargo workspace at the repo root; crates live in `compiler/`, `kernel/`, `oracle/`.
 - **Determinism everywhere:** no `HashMap`/`HashSet` iteration where order can reach output (use `BTreeMap`/`BTreeSet` or `Vec`); outputs, obligation IDs and C code must be byte-identical across runs and machines.

@@ -1,6 +1,6 @@
 # tests/
 
-**Layout only; no tests yet.** Each directory will hold `.qd` inputs with expected outputs (golden files) or expected diagnostics (by stable code).
+Each directory will hold `.qd` inputs with expected outputs (golden files) or expected diagnostics (by stable code).
 
 | Directory | Purpose | Phase |
 |---|---|---|
@@ -12,4 +12,6 @@
 | `oracle/` | request/response transcripts validated against the protocol schema | 3 |
 | `bench/` | agent-loop benchmark corpus (spec + `?h` body) and metrics | 9 |
 
-Conventions (provisional): one case per file; the first line states the expected outcome (`// expect: ok`, `// expect: E0412`).
+Conventions (provisional): one case per file. Line 1 is the provisional-syntax header required for every `.qd` file; line 2 states the expected outcome (`// expect: ok`, `// expect: E0203`).
+
+`parse/` is run by `cargo test` (`compiler/tests/corpus.rs`). For `ok` cases it checks parse success, formatter idempotence, `parse(format(x)) == parse(x)`, and that the file is already canonical (unless its name contains `noncanonical`). For error cases it checks the first diagnostic's code.

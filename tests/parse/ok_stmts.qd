@@ -1,0 +1,25 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+
+fn f(xs: &[i32], n: u32) -> i32
+    effects {}
+{
+    let mut acc: i32 = 0i32;
+    let k: u32 = (n + 1u32) * 2u32;
+    for i: usize in 0usize..xs.len {
+        if xs[i] < 0i32 {
+            continue;
+        } else if xs[i] == 7i32 {
+            break;
+        } else {
+            acc += xs[i];
+        }
+    }
+    {
+        acc -= 1i32;
+        acc *= 2i32;
+    }
+    g(acc, k);
+    p.x[0usize] = -acc;
+    return acc;
+}

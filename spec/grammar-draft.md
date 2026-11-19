@@ -126,18 +126,25 @@ cmp_op      = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
 arith_expr  = unary { arith_op unary } ;                  (* single operator kind per chain, see §6 *)
 arith_op    = "+" | "-" | "*" | "/" | "%" | "&" | "|" | "^" | "<<" | ">>" ;
 unary       = ( "-" | "!" ) unary | cast_expr ;
-cast_expr   = postfix [ "as" type ] ;
+cast_expr   = postfix [ "as" IDENT ] ;                    (* target: scalar type name *)
 postfix     = primary { "." IDENT | "[" expr "]" | "(" [ args ] ")" } ;
 args        = expr { "," expr } ;
 primary     = INT_LIT | "true" | "false" | HOLE
-            | path [ struct_lit ]
-            | "(" expr ")"
+            | expr_path [ struct_lit ]
+            | "(" ( ")" | expr ")" )                       (* unit value or parenthesized *)
             | "[" [ args ] "]" ;                          (* array literal *)
-struct_lit  = "." "{" field_init { "," field_init } [ "," ] "}" ;
+expr_path   = IDENT path_tail ;
+path_tail   = "::" ( IDENT path_tail | generic_args ) | ;   (* id::<u32> ends the path *)
+struct_lit  = DOT_LBRACE field_init { "," field_init } [ "," ] "}" ;
 field_init  = IDENT ":" expr ;
 ```
 
+`DOT_LBRACE` is the single token `.{` (no space allowed between `.` and `{`). This is the preferred fix from §8 and is what the phase-1 parser implements.
+
 Notes:
+- **Cast targets are a scalar type name** (`x as u32`), not a full `type`. With `as type`, `x as T < y` would need more than one token to decide between generic arguments and a comparison. Casts only apply to integer types, so nothing is lost.
+- **Unit value** `()` is a primary, so `-> ()` functions can `return ();`.
+- **`>>` and `>=` inside generic arguments** are split by the parser when it expects `>` (`Ring<Box<u8>>`). This is a lexer/parser interface detail, not an LL(1) conflict.
 - **Struct literals** use `Name.{ f: e }` (provisional). The leading `.` avoids the Rust/C ambiguity between `if x { … }` and `if Point { … }` while staying LL(1).
 - **Generic calls** need explicit arguments in phase 1: `id::<u32>(x)` (provisional). `::<` keeps `<` unambiguous with comparison.
 - `as` casts carry a **range precondition** (no silent truncation). Truncation, wrapping and saturation are named functions, not operators.
@@ -189,6 +196,7 @@ To verify mechanically in phase 1 (e.g. with a grammar tool):
 
 - [ ] No left recursion (all repetitions use `{ }`).
 - [ ] FIRST sets of `stmt` alternatives disjoint (`let`, `if`, `for`, `return`, `break`, `continue`, `{`, else expression starters). Note: `block` and array literal both start with `{`/`[` — `{` only starts a block in statement position; array literals start with `[`. OK.
-- [ ] `path [ struct_lit ]`: decided by `.` followed by `{` — **needs 2 tokens** (`.` alone is field access in `postfix`). Fix options: lex `.{` as a single token (preferred), or use a keyword prefix. Tracked as an open issue.
+- [ ] `path [ struct_lit ]`: decided by `.` followed by `{` — **needs 2 tokens** (`.` alone is field access in `postfix`). Fix options: lex `.{` as a single token (preferred), or use a keyword prefix. The phase-1 parser lexes `.{` as `DOT_LBRACE` (§5); still provisional.
+- [ ] `cast_expr`: `as type` followed by `<` is ambiguous (generic args vs comparison). Restricted to `as IDENT` (§5).
 - [ ] `expr_stmt` tail decided by one token.
 - [ ] `bracket_type` factored.

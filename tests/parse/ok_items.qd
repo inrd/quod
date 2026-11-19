@@ -1,0 +1,23 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+
+mod util;
+
+use util::math;
+
+pub type Point<T, const N: usize> {
+    // leading field comment
+    x: [T; N],
+    y: &mut [u8], // trailing field comment
+    z: &[Box<u8>; 4],
+}
+
+fn unit() -> ()
+    effects {}
+{
+    return ();
+}
+
+pub fn generic<T>(a: Ring<Box<u8>>, b: Ring<u8, 4>) -> bool
+    effects { io, alloc }
+{}

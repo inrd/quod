@@ -1,6 +1,6 @@
 # Examples
 
-> **All syntax is provisional and non-normative.** These files are design sketches, not test inputs. They do not parse with any existing tool.
+> **All syntax is provisional and non-normative.** These files are design sketches. `01_core_max.qd` parses with the phase-1 `quodc` and is kept in canonical format (checked by `cargo test`); the others use phase-2+ constructs and are rejected.
 
 | File | Shows | Phase |
 |---|---|---|

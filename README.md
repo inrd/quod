@@ -8,7 +8,7 @@ It is meant as a C alternative: a low-level, high-performance primitive with **n
 |---|---|
 | Compiler | `quodc` |
 | Source extension | `.qd` |
-| Status | **Phase 0 done; phase 1 next.** Core decisions accepted ([ADR-0001–0003](docs/adr/README.md)). No compiler exists yet. All syntax is provisional. |
+| Status | **Phase 1 in progress.** Core decisions accepted ([ADR-0001–0003](docs/adr/README.md)). `quodc` has a lexer, parser and canonical formatter; no type checker or C emitter yet. All syntax is provisional. |
 
 ## The idea in four lines
 
@@ -37,12 +37,12 @@ fn push(rb: &mut Ring<f32, N>, x: f32) -> Result<(), Full>
 ```
 docs/          design documents (start with vision.md)
 docs/adr/      architecture decision records
-spec/          language specification drafts (grammar)
+spec/          language specification drafts (grammar, format, diagnostics)
 examples/      provisional syntax sketches (.qd)
-compiler/      quodc front end, checker, C emitter    (empty: phase 1)
+compiler/      quodc: lexer, parser, formatter        (phase 1, in progress)
 kernel/        trusted proof checker                  (empty: phase 2)
 oracle/        JSON query server for agents           (empty: phase 3)
-tests/         test corpus layout                     (empty)
+tests/         test corpus (parse/ populated)
 ```
 
 ## Reading order
@@ -53,7 +53,15 @@ tests/         test corpus layout                     (empty)
 4. [docs/roadmap.md](docs/roadmap.md)
 5. [docs/open-questions.md](docs/open-questions.md)
 
-Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs/oracle-protocol.md), [prior art](docs/prior-art.md), [grammar draft](spec/grammar-draft.md).
+Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs/oracle-protocol.md), [prior art](docs/prior-art.md), [grammar draft](spec/grammar-draft.md), [canonical format](spec/format.md), [diagnostic codes](spec/diagnostics.md).
+
+## Building
+
+```
+cargo build
+cargo test
+./target/debug/quodc fmt examples/01_core_max.qd
+```
 
 ## License
 

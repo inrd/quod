@@ -14,12 +14,16 @@ pub fn stats(xs: &[i32]) -> Stats
     if xs.len == 0usize {
         return Stats.{ min: 0, max: 0, count: 0 };
     }
-    let mut lo: i32 = xs[0usize];          // phase 1: bounds check emitted (len > 0 known only dynamically)
+    let mut lo: i32 = xs[0usize]; // phase 1: bounds check emitted (len > 0 known only dynamically)
     let mut hi: i32 = xs[0usize];
-    for i: usize in 1usize..xs.len {        // bounded: range fixed at loop entry
-        let v: i32 = xs[i];                 // phase 2: proven i < xs.len, check elided
-        if v < lo { lo = v; }
-        if v > hi { hi = v; }
+    for i: usize in 1usize..xs.len { // bounded: range fixed at loop entry
+        let v: i32 = xs[i]; // phase 2: proven i < xs.len, check elided
+        if v < lo {
+            lo = v;
+        }
+        if v > hi {
+            hi = v;
+        }
     }
     // Cast carries a range precondition; phase 1 requires an explicit guard.
     if xs.len > 4294967295usize {
