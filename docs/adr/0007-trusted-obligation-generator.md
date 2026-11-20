@@ -5,7 +5,7 @@
 - **Deciders:** —
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** trust-boundary item 1 in [architecture.md](../architecture.md#trust-boundaries) ("obligation generation is faithful")
-- **Depends on:** ADR-0001 (Rust, kernel constraints), ADR-0003 (kernel logic)
+- **Depends on:** ADR-0001 (Rust, kernel constraints), ADR-0002 (arithmetic semantics), ADR-0003 (kernel logic), ADR-0005 (pointer-sized integers); the encodings follow ADR-0008 (Proposed)
 
 ## Context
 
@@ -40,17 +40,60 @@ Option B now, with Option D as the long-term path.
 - The front end (source → Core IR) stays untrusted. To close the spec gap, **human reports are generated from Core IR**, not from source: the human reviews the spec that is actually verified. A round-trip test (source spec → Core IR → rendered spec) catches front-end mistranslation early but is not part of the trusted base.
 - Obligation IDs and fingerprints are computed in `vcgen` from Core IR structure, so they are deterministic by construction.
 
+### Encodings
+
+These rules are part of `vcgen`'s trusted behavior and will be restated normatively in `spec/core-ir.md`. They follow [ADR-0008](0008-kernel-rules-from-real-certificates.md) §4–§5 (Proposed) and the experiments behind them.
+
+**Sequences** ([experiment 0003](../experiments/0003-seq-as-arrays.md)): the kernel has `Array(Int, S)` with read-over-write axioms only; `Seq(S)` exists only in this encoding.
+
+| Core IR | Obligation |
+|---|---|
+| value `a: Seq(S)` (array, slice, `&`/`&mut` view) | an array term `a : Array(Int, S)` and a length term `a_len : Int`, with hypothesis `0 <= a_len` |
+| `a.len()` | `a_len` |
+| `a[k]` | `select(a, k)`, with the bounds obligation `0 <= k < a_len` |
+| `a[i := v]` | `store(a, i, v)`; the length term stays `a_len` |
+| view `&a[lo..hi]` | no new array: base `a`, offset `lo`, length `hi - lo`; `s[k]` is `select(a, lo + k)` |
+| view of a view | offsets add: base `a`, offset `lo + lo2` |
+| write through a `&mut` view | `store` on the base array at `offset + i` |
+| `s == t` | `s_len = t_len ∧ ∀k. 0 <= k < s_len → s[k] = t[k]` (indices are relative to each view's offset) |
+| quantifier over a view's elements | ranges over base indices (`∀m. lo <= m < hi → … select(a, m) …`), not view indices |
+
+- **Never array `=` for sequence equality.** Array `=` also constrains indices outside `[0, len)`, so as a hypothesis it assumes facts Quod's semantics does not give. That would be unsound.
+- Quantifying over base indices is not needed for soundness. It keeps solver triggers free of arithmetic (experiment 0003, `s04` vs `s05`).
+
+**Machine integers** ([experiment 0002](../experiments/0002-bit-vectors.md)): the kernel has no bit-vector sort.
+
+| Core IR | Obligation |
+|---|---|
+| value `x: uN` | `x : Int` with hypothesis `0 <= x < 2^N` |
+| value `x: iN` | `x : Int` with hypothesis `-2^(N-1) <= x < 2^(N-1)` |
+| value `x: usize` / `isize` | range hypothesis of `u64` / `i64`; stores and results must fit the 32-bit range ([ADR-0005](0005-portable-static-checks-for-pointer-sized-integers.md)) |
+| code `+ - *`, casts, `<<` (ADR-0002 preconditions) | exact `Int` arithmetic plus the range obligation on the result |
+| `int(e)` (ADR-0002) | `e` itself |
+| `& \| ^`, `>>` on unsigned `uN` | uninterpreted symbols `andN`, `orN`, `xorN`, `lshrN` |
+| `add_wrap`, `sub_wrap`, `shl_wrap` on `uN` | uninterpreted symbols `add_wrapN`, `sub_wrapN`, `shl_wrapN` |
+| unsigned comparisons | `<`, `<=`, `=` on `Int` |
+
+- Range hypotheses are trusted. A range that is too wide makes valid code unprovable. One that is too narrow is unsound. Soundness tests must cover both.
+- The meaning of each symbol comes from the kernel's `qd_bv_int` axiom schemas, never from `vcgen`. A kernel obligation carries no schema as a hypothesis. Proofs cite schemas through `qd_bv_int` steps, which the kernel checks against its own axiom file.
+- **Solver export** (untrusted): when `vcgen`'s output is printed as SMT-LIB for solvers or agents, it adds the schemas for the symbols the obligation uses, as quantified axioms with patterns. A wrong export can only make proofs fail to elaborate. It cannot get a false proof past the kernel. So the exporter may live outside `vcgen`.
+- **Not yet encoded:**
+  - Width-dependent operators on `usize`/`isize`: `add_wrap`, `sub_wrap`, `shl_wrap` and `!` give different results on 32- and 64-bit targets.
+  - Bitwise operators on signed types, arithmetic `>>`, and `mul_wrap`.
+
+  `vcgen` rejects these with a diagnostic until an ADR adds them. `&`, `|`, `^` and `>>` on `usize` use the 64-bit symbols; their schemas hold at every width.
+
 ## Consequences
 
 - **Trusted base grows:** `vcgen` (≤ 3,000 lines) and the Core IR semantics document join the kernel. Both are listed in every trust report. This is not new trust: an obligation generator is trusted under every option except D; this ADR makes it small, constrained and visible.
-- The kernel stays a pure first-order proof checker; its ADR-0003 rules and budget are unchanged.
+- The kernel stays a pure first-order proof checker; its rules (ADR-0003, or ADR-0008 if accepted) and budget are unchanged by this ADR. The sequence and machine-integer encodings move bookkeeping (lengths, view offsets, range facts) from kernel axioms into `vcgen`.
 - Core IR becomes a stable interface. Changes to its semantics need an ADR, like kernel rule changes.
 - Compilation from Core IR to C (trust-boundary item 2) is still open and unaffected.
 - **Agent loop:** none directly; agents see the same obligations. Reports from Core IR may read slightly less like the source; the report generator must render them carefully.
-- Docs to update on acceptance: `architecture.md` (component table, trust boundaries), `CLAUDE.md` (crate list and constraints), `README.md` layout, new `spec/core-ir.md`, new `vcgen/README.md`.
+- Docs to update on acceptance: `architecture.md` (component table, trust boundaries), `CLAUDE.md` (crate list and constraints), `README.md` layout, new `spec/core-ir.md` (including the encodings above), new `vcgen/README.md`.
 
 ## Validation
 
 - `vcgen` stays within budget through phase 2.
-- Soundness test suite (phase-2 exit criterion) gains generator cases: programs with known bugs whose obligations must be unprovable.
+- Soundness test suite (phase-2 exit criterion) gains generator cases: programs with known bugs whose obligations must be unprovable. These include out-of-range reads through a view, sequence equality that differs only past `len`, and overflow that is reachable only on a 32-bit target.
 - Revisit if Core IR cannot be kept small enough to specify in one document, or if a mechanized semantics (Option D) becomes cheap.
