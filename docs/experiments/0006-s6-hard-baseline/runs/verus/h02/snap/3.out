@@ -1,0 +1,38 @@
+error: postcondition not satisfied
+  --> h02_dutch_flag.rs:70:13
+   |
+70 |       ensures s.to_multiset().count(s[i]) > 0,
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+73 | /     if i < s.len() - 1 {
+74 | |         lemma_count_pos(s.drop_last(), i);
+75 | |     }
+   | |_____- at the end of the function body
+
+note: function body check: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> h02_dutch_flag.rs:78:7
+   |
+78 | proof fn lemma_upd_ms(s: Seq<u32>, i: int, x: u32)
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: assertion failed
+  --> h02_dutch_flag.rs:87:16
+   |
+87 |         assert(t.to_multiset() =~= s.to_multiset().remove(s[i]).insert(x));
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: assertion failed
+  --> h02_dutch_flag.rs:92:16
+   |
+92 |         assert(t.to_multiset() =~= s.to_multiset().remove(s[i]).insert(x));
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: invariant not satisfied at end of loop body
+  --> h02_dutch_flag.rs:32:13
+   |
+32 |             xs@.to_multiset() == old(xs)@.to_multiset(),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 3 verified, 3 errors
+error: aborting due to 4 previous errors
+

@@ -1,0 +1,9 @@
+
+
+h07_pool_list_len.dfy(26,19): Error: value does not satisfy the subset constraints of 'usize'
+   |
+26 |     count := count + 1;
+   |                    ^
+
+
+Dafny program verifier finished with 4 verified, 1 error

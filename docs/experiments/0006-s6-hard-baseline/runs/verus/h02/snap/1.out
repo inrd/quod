@@ -1,0 +1,68 @@
+error[E0308]: mismatched types
+  --> h02_dutch_flag.rs:61:35
+   |
+61 |         assert(m.remove(s[i]).add(s[j]).remove(s[j]).add(s[i]) =~= m);
+   |                               --- ^^^^ expected `Multiset<u32>`, found `u32`
+   |                               |
+   |                               arguments to this method are incorrect
+   |
+   = note: expected struct `vstd::multiset::Multiset<u32>`
+                found type `u32`
+note: method defined here
+  --> multiset.rs:82:25
+
+error[E0308]: mismatched types
+  --> h02_dutch_flag.rs:61:58
+   |
+61 |         assert(m.remove(s[i]).add(s[j]).remove(s[j]).add(s[i]) =~= m);
+   |                                                      --- ^^^^ expected `Multiset<u32>`, found `u32`
+   |                                                      |
+   |                                                      arguments to this method are incorrect
+   |
+   = note: expected struct `vstd::multiset::Multiset<u32>`
+                found type `u32`
+note: method defined here
+  --> multiset.rs:82:25
+
+error[E0308]: mismatched types
+  --> h02_dutch_flag.rs:81:78
+   |
+81 |     ensures s.update(i, x).to_multiset() == s.to_multiset().remove(s[i]).add(x),
+   |                                                                          --- ^ expected `Multiset<u32>`, found `u32`
+   |                                                                          |
+   |                                                                          arguments to this method are incorrect
+   |
+   = note: expected struct `vstd::multiset::Multiset<u32>`
+                found type `u32`
+note: method defined here
+  --> multiset.rs:82:25
+
+error[E0308]: mismatched types
+  --> h02_dutch_flag.rs:89:69
+   |
+89 |         assert(t.to_multiset() =~= s.to_multiset().remove(s[i]).add(x));
+   |                                                                 --- ^ expected `Multiset<u32>`, found `u32`
+   |                                                                 |
+   |                                                                 arguments to this method are incorrect
+   |
+   = note: expected struct `vstd::multiset::Multiset<u32>`
+                found type `u32`
+note: method defined here
+  --> multiset.rs:82:25
+
+error[E0308]: mismatched types
+  --> h02_dutch_flag.rs:94:69
+   |
+94 |         assert(t.to_multiset() =~= s.to_multiset().remove(s[i]).add(x));
+   |                                                                 --- ^ expected `Multiset<u32>`, found `u32`
+   |                                                                 |
+   |                                                                 arguments to this method are incorrect
+   |
+   = note: expected struct `vstd::multiset::Multiset<u32>`
+                found type `u32`
+note: method defined here
+  --> multiset.rs:82:25
+
+error: aborting due to 5 previous errors
+
+For more information about this error, try `rustc --explain E0308`.

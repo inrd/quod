@@ -1,0 +1,68 @@
+// Experiment 0006 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+
+verus! {
+
+// Merges two sorted arrays into a new sorted vector.
+// SPEC-BEGIN
+fn merge(a: &[u32], b: &[u32]) -> (out: Vec<u32>)
+    requires
+        a.len() + b.len() <= usize::MAX,
+        forall|i: int, j: int| 0 <= i <= j < a.len() ==> #[trigger] a[i] <= #[trigger] a[j],
+        forall|i: int, j: int| 0 <= i <= j < b.len() ==> #[trigger] b[i] <= #[trigger] b[j],
+    ensures
+        out.len() == a.len() + b.len(),
+        forall|i: int, j: int| 0 <= i <= j < out.len() ==> #[trigger] out[i] <= #[trigger] out[j],
+        out@.to_multiset() == a@.to_multiset().add(b@.to_multiset()),
+// SPEC-END
+{
+    let mut out: Vec<u32> = Vec::new();
+    let mut i: usize = 0;
+    let mut j: usize = 0;
+    while i < a.len() || j < b.len()
+        invariant
+            i <= a.len(),
+            j <= b.len(),
+            a.len() + b.len() <= usize::MAX,
+            forall|p: int, q: int| 0 <= p <= q < a.len() ==> #[trigger] a[p] <= #[trigger] a[q],
+            forall|p: int, q: int| 0 <= p <= q < b.len() ==> #[trigger] b[p] <= #[trigger] b[q],
+            out.len() == i + j,
+            forall|p: int, q: int| 0 <= p <= q < out.len() ==> #[trigger] out[p] <= #[trigger] out[q],
+            forall|k: int| 0 <= k < out.len() && i < a.len() ==> out[k] <= a[i as int],
+            forall|k: int| 0 <= k < out.len() && j < b.len() ==> out[k] <= b[j as int],
+            out@.to_multiset() == a@.take(i as int).to_multiset().add(b@.take(j as int).to_multiset()),
+        decreasing a.len() + b.len() - i - j,
+    {
+        let ghost old = out@;
+        if j >= b.len() || (i < a.len() && a[i] <= b[j]) {
+            let x = a[i];
+            out.push(x);
+            proof {
+                let s = a@.take(i as int);
+                assert(a@.take(i as int + 1) =~= s.push(x));
+                assert(s.push(x).drop_last() =~= s);
+                assert(old.push(x) =~= out@);
+            }
+            i += 1;
+        } else {
+            let x = b[j];
+            out.push(x);
+            proof {
+                let s = b@.take(j as int);
+                assert(b@.take(j as int + 1) =~= s.push(x));
+                assert(s.push(x).drop_last() =~= s);
+                assert(old.push(x) =~= out@);
+            }
+            j += 1;
+        }
+    }
+    proof {
+        assert(a@.take(a.len() as int) =~= a@);
+        assert(b@.take(b.len() as int) =~= b@);
+    }
+    out
+}
+
+fn main() {}
+
+} // verus!

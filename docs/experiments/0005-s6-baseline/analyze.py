@@ -188,7 +188,7 @@ def edits(lang, text):
     b, e = body_span(text)
     body = text[b:e]
     res = {}
-    m = re.search(r"\bvar\s+(\w+)" if lang == "dafny" else r"\blet\s+(?:mut\s+)?(\w+)", body)
+    m = re.search(r"\bvar\s+(\w+)" if lang == "dafny" else r"\blet\s+(?:(?:mut|ghost|tracked)\s+)*(\w+)", body)
     if m and m.group(1) != "_":
         v = m.group(1)
         res["E1"] = text[:b] + re.sub(r"\b%s\b" % re.escape(v), v + "_q", body) + text[e:]
@@ -208,7 +208,7 @@ def edits(lang, text):
         for i in range(len(lines) - 3):
             if lines[i].strip() == "invariant":
                 a, c, nxt = lines[i + 1].strip(), lines[i + 2].strip(), lines[i + 3].strip()
-                if a.endswith(",") and c.endswith(",") and (nxt.endswith(",") or
+                if a.endswith(",") and c.endswith(",") and not re.match(r"(decreases|ensures)", c) and (nxt.endswith(",") or
                                                            re.match(r"(decreases|ensures|\{)", nxt)):
                     lines[i + 1], lines[i + 2] = lines[i + 2], lines[i + 1]
                     res["E2"] = text[:b] + "\n".join(lines) + text[e:]

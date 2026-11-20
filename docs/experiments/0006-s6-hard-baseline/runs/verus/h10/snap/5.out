@@ -1,0 +1,9 @@
+error: assertion failed
+  --> h10_merge.rs:34:16
+   |
+34 |         assert(Seq::<u32>::empty().to_multiset() =~= Multiset::<u32>::empty());
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 3 verified, 1 errors
+error: aborting due to 1 previous error
+

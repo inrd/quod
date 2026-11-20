@@ -1,0 +1,10 @@
+
+
+h06_dedup_sorted.dfy(26,14): Error: this invariant could not be proved to be maintained by the loop
+ Related message: loop invariant violation
+   |
+26 |     invariant forall v :: v in s[..i] <==> v in xs[..k]
+   |               ^^^^^^
+
+
+Dafny program verifier finished with 4 verified, 1 error

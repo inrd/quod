@@ -1,0 +1,14 @@
+error: reveal/fuel statement is not allowed here because the function `vstd::seq_lib::impl&%0::to_multiset` is marked `closed` and thus its body is not visible here (note: `reveal` statements are intended for functions that are opaque, not functions that are closed)
+  --> h02_dutch_flag.rs:73:5
+   |
+73 |     reveal_with_fuel(Seq::to_multiset, 2);
+   |     ^^^^^^^^^^^^^^^^
+
+error: reveal/fuel statement is not allowed here because the function `vstd::seq_lib::impl&%0::to_multiset` is marked `closed` and thus its body is not visible here (note: `reveal` statements are intended for functions that are opaque, not functions that are closed)
+  --> h02_dutch_flag.rs:84:5
+   |
+84 |     reveal_with_fuel(Seq::to_multiset, 2);
+   |     ^^^^^^^^^^^^^^^^
+
+error: aborting due to 2 previous errors
+

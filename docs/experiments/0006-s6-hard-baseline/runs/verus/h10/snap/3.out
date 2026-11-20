@@ -1,0 +1,14 @@
+error[E0433]: cannot find type `Multiset` in this scope
+  --> h10_merge.rs:31:54
+   |
+31 |         assert(Seq::<u32>::empty().to_multiset() =~= Multiset::<u32>::empty());
+   |                                                      ^^^^^^^^ use of undeclared type `Multiset`
+   |
+help: consider importing this struct
+   |
+ 2 + use vstd::multiset::Multiset;
+   |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

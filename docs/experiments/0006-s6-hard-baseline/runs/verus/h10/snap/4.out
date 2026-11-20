@@ -1,0 +1,15 @@
+error: assertion failed
+  --> h10_merge.rs:10:27
+   |
+10 |     assert forall|x: u32| #[trigger] s.push(x).to_multiset() =~= s.to_multiset().insert(x) by {
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: assertion failed
+  --> h10_merge.rs:32:16
+   |
+32 |         assert(Seq::<u32>::empty().to_multiset() =~= Multiset::<u32>::empty());
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 2 verified, 2 errors
+error: aborting due to 2 previous errors
+

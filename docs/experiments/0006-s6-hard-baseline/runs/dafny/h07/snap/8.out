@@ -1,0 +1,23 @@
+h07_pool_list_len.dfy(38,14): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+38 |   var full := set k: int | 0 <= k < n;
+   |               ^^^
+
+h07_pool_list_len.dfy(50,11): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+50 |   ensures |set k: int | 0 <= k < n| == n
+   |            ^^^
+
+h07_pool_list_len.dfy(55,12): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+55 |     assert (set k: int | 0 <= k < n) == (set k: int | 0 <= k < n - 1) + {n - 1};
+   |             ^^^
+
+h07_pool_list_len.dfy(55,41): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+55 |     assert (set k: int | 0 <= k < n) == (set k: int | 0 <= k < n - 1) + {n - 1};
+   |                                          ^^^
+
+
+Dafny program verifier finished with 10 verified, 0 errors
+Compilation failed because warnings were found and --allow-warnings is false

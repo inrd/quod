@@ -1,0 +1,29 @@
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> h01_insertion_sort.rs:44:20
+   |
+44 |                 xs.set(j - 1, y);
+   |                    ^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> h01_insertion_sort.rs:45:20
+   |
+45 |                 xs.set(j, x);
+   |                    ^^^
+
+error: assertion failed
+  --> h01_insertion_sort.rs:69:12
+   |
+69 |     assert(seq![x, y].to_multiset() =~= seq![y, x].to_multiset()) by {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed
+
+error: invariant not satisfied at end of loop body
+  --> h01_insertion_sort.rs:25:13
+   |
+25 |             forall|a: int, b: int| 0 <= a <= b < i ==> xs[a] <= xs[b],
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 3 verified, 2 errors
+error: aborting due to 2 previous errors; 2 warnings emitted
+

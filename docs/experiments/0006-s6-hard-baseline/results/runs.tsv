@@ -1,0 +1,21 @@
+lang	task	success	verify_ok	spec_ok	forbidden	review	calls	turns	tokens_in	tokens_out	cost	wall	code	annot	step	claimed	errors
+dafny	h01	1	1	1			3	8	38181	2099	0.0475	27	7	11	7	VERIFIED	verification,verification
+dafny	h02	1	1	1			1	4	20442	688	0.0243	13	15	7	0	VERIFIED	
+dafny	h03	1	1	1			1	4	20126	625	0.0229	12	5	6	0	VERIFIED	
+dafny	h04	1	1	1			1	4	27574	778	0.0256	14	5	9	5	VERIFIED	
+dafny	h05	1	1	1			1	4	20721	987	0.0244	14	14	5	0	VERIFIED	
+dafny	h06	1	1	1			2	6	29007	1359	0.0314	19	9	13	0	VERIFIED	verification
+dafny	h07	1	1	1			9	26	201870	6092	0.1519	70	8	20	19	VERIFIED	verification,verification,verification,verification,verification,verification,verification
+dafny	h08	1	1	1			1	4	21146	1004	0.0255	15	10	10	0	VERIFIED	
+dafny	h09	1	1	1			1	4	21288	1144	0.0275	15	9	11	0	VERIFIED	
+dafny	h10	1	1	1			1	4	20715	1016	0.0248	14	11	10	0	VERIFIED	
+verus	h01	1	1	1			3	10	43974	3817	0.0737	36	15	17	16	VERIFIED	typing,verification
+verus	h02	1	1	1			4	16	86449	5416	0.1061	47	19	20	21	VERIFIED	typing,typing,verification
+verus	h03	1	1	1			1	4	20316	870	0.0222	12	11	6	6	VERIFIED	
+verus	h04	1	1	1			1	4	20597	1128	0.0259	14	8	8	8	VERIFIED	
+verus	h05	1	1	1			3	8	40272	1912	0.0437	23	12	10	2	VERIFIED	verification,verification
+verus	h06	1	1	1			6	16	114647	7377	0.1516	83	19	17	40	VERIFIED	verification,verification,verification,verification,verification
+verus	h07	1	1	1			3	9	41538	2567	0.0559	29	9	7	14	VERIFIED	verification,verification
+verus	h08	1	1	1			2	6	39820	1532	0.0398	20	15	13	7	VERIFIED	typing
+verus	h09	1	1	1			1	4	20478	875	0.0226	13	9	4	2	VERIFIED	
+verus	h10	1	1	1			6	17	90852	4369	0.0876	44	18	15	21	VERIFIED	syntax,verification,typing,verification,verification

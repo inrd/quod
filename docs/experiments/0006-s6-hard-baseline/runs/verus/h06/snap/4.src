@@ -1,0 +1,105 @@
+// Experiment 0006 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+
+verus! {
+
+// Removes duplicates from a sorted array in place; returns the new length.
+// SPEC-BEGIN
+fn dedup_sorted(xs: &mut [u32]) -> (k: usize)
+    requires
+        forall|i: int, j: int| 0 <= i <= j < old(xs).len() ==> #[trigger] old(xs)[i] <= #[trigger] old(xs)[j],
+    ensures
+        final(xs).len() == old(xs).len(),
+        k <= final(xs).len(),
+        forall|a: int, b: int| 0 <= a < b < k ==> #[trigger] final(xs)[a] < #[trigger] final(xs)[b],
+        forall|v: u32| old(xs)@.contains(v) <==> final(xs)@.subrange(0, k as int).contains(v),
+// SPEC-END
+{
+    let n = xs.len();
+    if n == 0 {
+        return 0;
+    }
+    let ghost old = xs@;
+    let mut k: usize = 1;
+    let mut i: usize = 1;
+    assert(xs@[0] == old[0]);
+    assert(forall|m: int| 0 <= m < 1 ==> exists|j: int| 0 <= j < 1 && #[trigger] xs@[m] == old[j]) by {
+        assert(xs@[0] == old[0]);
+    }
+    assert(forall|j: int| 0 <= j < 1 ==> exists|m: int| 0 <= m < 1 && #[trigger] old[j] == xs@[m]) by {
+        assert(xs@[0] == old[0]);
+    }
+    while i < n
+        invariant
+            xs.len() == n,
+            old.len() == n,
+            forall|a: int, b: int| 0 <= a <= b < n ==> old[a] <= old[b],
+            1 <= k <= i <= n,
+            forall|j: int| i <= j < n ==> xs@[j] == old[j],
+            xs@[k as int - 1] == old[i as int - 1],
+            forall|a: int, b: int| 0 <= a < b < k ==> xs@[a] < xs@[b],
+            forall|m: int| 0 <= m < k ==> exists|j: int| 0 <= j < i && #[trigger] xs@[m] == old[j],
+            forall|j: int| 0 <= j < i ==> exists|m: int| 0 <= m < k && #[trigger] old[j] == xs@[m],
+        decreases n - i,
+    {
+        let ghost ps = xs@;
+        let ghost pk = k;
+        let ghost pi = i;
+        assert(old[pi as int - 1] <= old[pi as int]);
+        if xs[i] != xs[k - 1] {
+            let x = xs[i];
+            xs[k] = x;
+            k += 1;
+            i += 1;
+            assert forall|j: int| 0 <= j < i implies exists|m: int| 0 <= m < k && #[trigger] old[j] == xs@[m] by {
+                if j < pi {
+                    let m = choose|m: int| 0 <= m < pk && old[j] == #[trigger] ps[m];
+                    assert(old[j] == xs@[m]);
+                } else {
+                    assert(old[j] == xs@[pk as int]);
+                }
+            }
+            assert forall|m: int| 0 <= m < k implies exists|j: int| 0 <= j < i && #[trigger] xs@[m] == old[j] by {
+                if m < pk {
+                    let j = choose|j: int| 0 <= j < pi && ps[m] == #[trigger] old[j];
+                    assert(xs@[m] == old[j]);
+                } else {
+                    assert(xs@[m] == old[pi as int]);
+                }
+            }
+        } else {
+            i += 1;
+            assert forall|j: int| 0 <= j < i implies exists|m: int| 0 <= m < k && #[trigger] old[j] == xs@[m] by {
+                if j < pi {
+                    let m = choose|m: int| 0 <= m < pk && old[j] == #[trigger] xs@[m];
+                    assert(old[j] == xs@[m]);
+                } else {
+                    assert(old[j] == xs@[pk as int - 1]);
+                }
+            }
+            assert forall|m: int| 0 <= m < k implies exists|j: int| 0 <= j < i && #[trigger] xs@[m] == old[j] by {
+                let j = choose|j: int| 0 <= j < pi && xs@[m] == #[trigger] old[j];
+                assert(xs@[m] == old[j]);
+            }
+        }
+    }
+    proof {
+        assert forall|v: u32| old.contains(v) <==> xs@.subrange(0, k as int).contains(v) by {
+            if old.contains(v) {
+                let j = choose|j: int| 0 <= j < old.len() && old[j] == v;
+                let m = choose|m: int| 0 <= m < k && old[j] == #[trigger] xs@[m];
+                assert(xs@.subrange(0, k as int)[m] == v);
+            }
+            if xs@.subrange(0, k as int).contains(v) {
+                let m = choose|m: int| 0 <= m < k && xs@.subrange(0, k as int)[m] == v;
+                let j = choose|j: int| 0 <= j < n && xs@[m] == #[trigger] old[j];
+                assert(old[j] == v);
+            }
+        }
+    }
+    k
+}
+
+fn main() {}
+
+} // verus!

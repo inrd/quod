@@ -1,0 +1,9 @@
+error: possible arithmetic underflow/overflow
+  --> h07_pool_list_len.rs:33:9
+   |
+33 |         count += 1;
+   |         ^^^^^^^^^^
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

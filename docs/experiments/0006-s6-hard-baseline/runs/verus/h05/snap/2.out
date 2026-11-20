@@ -1,0 +1,47 @@
+note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function
+  --> h05_two_sum_sorted.rs:19:5
+   |
+19 |     while lo + 1 < hi
+   |     ^^^^^^^^^^^^^^^^^
+
+error: possible arithmetic underflow/overflow
+  --> h05_two_sum_sorted.rs:19:11
+   |
+19 |     while lo + 1 < hi
+   |           ^^^^^^
+
+note: recommendation not met
+  --> h05_two_sum_sorted.rs:24:59
+   |
+24 |                 0 <= a < b < n && (a < lo || b >= hi) ==> #[trigger] xs[a] + #[trigger] xs[b] != target,
+   |                                                           ^^^^^^^^^^^^^^^^
+   |
+  --> slice.rs:31:12
+   |
+   = note: recommendation not met
+
+note: recommendation not met
+  --> h05_two_sum_sorted.rs:24:78
+   |
+24 |                 0 <= a < b < n && (a < lo || b >= hi) ==> #[trigger] xs[a] + #[trigger] xs[b] != target,
+   |                                                                              ^^^^^^^^^^^^^^^^
+   |
+  --> slice.rs:31:12
+   |
+   = note: recommendation not met
+
+error: precondition not met: index in bounds for this access
+  --> h05_two_sum_sorted.rs:27:17
+   |
+27 |         let s = xs[lo] as u64 + xs[hi - 1] as u64;
+   |                 ^^^^^^
+
+error: precondition not met: index in bounds for this access
+  --> h05_two_sum_sorted.rs:27:33
+   |
+27 |         let s = xs[lo] as u64 + xs[hi - 1] as u64;
+   |                                 ^^^^^^^^^^
+
+verification results:: 1 verified, 2 errors
+error: aborting due to 3 previous errors
+

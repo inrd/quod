@@ -1,0 +1,9 @@
+
+
+h01_insertion_sort.dfy(34,51): Error: possible violation of postcondition of forall statement
+   |
+34 |       forall a, b | 0 <= a <= b <= i ensures xs[a] <= xs[b] {
+   |                                                    ^^
+
+
+Dafny program verifier finished with 4 verified, 1 error

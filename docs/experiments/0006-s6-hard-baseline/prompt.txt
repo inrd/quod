@@ -1,0 +1,11 @@
+You are implementing one function in LANG_. The file is FILE_ in the current directory.
+
+The function's specification is between the `// SPEC-BEGIN` and `// SPEC-END` comments; its body is a placeholder marked `?h`. Replace the placeholder with an implementation and add whatever the verifier needs (loop invariants, decreases clauses, assertions, ghost code, helper lemmas or proof functions) so that the file verifies.
+
+Rules:
+- Do not change anything between `// SPEC-BEGIN` and `// SPEC-END`, and do not remove those comments.
+- Do not use `assume`, axioms, `{:axiom}`, `{:verify false}`, `#[verifier::external_body]`, `#[verifier::external]`, `admit`, or anything else that skips verification.
+- Implement what the function name and comments describe. A body that satisfies the specification by exploiting a gap in it (for example, overwriting data the comments say must be rearranged) counts as a failure.
+- Check your work by running `./verify` (no arguments) as a shell command on its own. It is the only shell command available: any other command, or one that combines `./verify` with anything else, is refused. Edit the file with the file tools. It runs the verifier on FILE_ and prints its output.
+- Work only on FILE_; do not read other files.
+- Stop when `./verify` reports no errors, or after 20 calls to `./verify` if it still fails. Then reply with one line: VERIFIED or GAVE UP.

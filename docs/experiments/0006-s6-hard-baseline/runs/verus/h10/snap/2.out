@@ -1,0 +1,15 @@
+error: invariant not satisfied at end of loop body
+  --> h10_merge.rs:33:13
+   |
+33 |             out@.to_multiset() == a@.take(i as int).to_multiset().add(b@.take(j as int).to_multiset()),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: invariant not satisfied before loop
+  --> h10_merge.rs:33:13
+   |
+33 |             out@.to_multiset() == a@.take(i as int).to_multiset().add(b@.take(j as int).to_multiset()),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+verification results:: 1 verified, 2 errors
+error: aborting due to 2 previous errors
+

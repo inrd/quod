@@ -1,0 +1,76 @@
+// Experiment 0006 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+use vstd::slice::SliceAdditionalExecFns;
+
+verus! {
+
+// Sorts xs in place.
+// SPEC-BEGIN
+fn insertion_sort(xs: &mut [u32])
+    ensures
+        final(xs).len() == old(xs).len(),
+        forall|i: int, j: int| 0 <= i <= j < final(xs).len() ==> #[trigger] final(xs)[i] <= #[trigger] final(xs)[j],
+        final(xs)@.to_multiset() == old(xs)@.to_multiset(),
+// SPEC-END
+{
+    let n = xs.len();
+    let ghost orig = xs@;
+    let mut i: usize = 1;
+    while i < n
+        invariant
+            n == xs.len(),
+            1 <= i || n == 0,
+            i <= n || n == 0,
+            xs@.to_multiset() == orig.to_multiset(),
+            forall|a: int, b: int| 0 <= a <= b < i ==> xs[a] <= xs[b],
+        decreases n - i,
+    {
+        let mut j = i;
+        while j > 0 && xs[j - 1] > xs[j]
+            invariant
+                forall|b: int| j < b <= i ==> xs[j as int] <= xs[b],
+                n == xs.len(),
+                j <= i < n,
+                xs@.to_multiset() == orig.to_multiset(),
+                forall|a: int, b: int| 0 <= a <= b <= i && a != j && b != j ==> xs[a] <= xs[b],
+                forall|a: int, b: int| 0 <= a < j && j < b <= i ==> xs[a] <= xs[b],
+            decreases j,
+        {
+            let x = xs[j - 1];
+            let y = xs[j];
+            proof {
+                lemma_swap_ms(xs@, (j - 1) as int);
+            }
+            xs.set(j - 1, y);
+            xs.set(j, x);
+            j = j - 1;
+        }
+        i = i + 1;
+    }
+}
+
+proof fn lemma_swap_ms(s: Seq<u32>, k: int)
+    requires 0 <= k, k + 1 < s.len(),
+    ensures s.update(k, s[k + 1]).update(k + 1, s[k]).to_multiset() == s.to_multiset(),
+{
+    let a = s.subrange(0, k);
+    let b = s.subrange(k + 2, s.len() as int);
+    let x = s[k];
+    let y = s[k + 1];
+    assert(s =~= a + seq![x, y] + b);
+    assert(s.update(k, y).update(k + 1, x) =~= a + seq![y, x] + b);
+    vstd::seq_lib::lemma_multiset_commutative(a + seq![x, y], b);
+    vstd::seq_lib::lemma_multiset_commutative(a, seq![x, y]);
+    vstd::seq_lib::lemma_multiset_commutative(a + seq![y, x], b);
+    vstd::seq_lib::lemma_multiset_commutative(a, seq![y, x]);
+    assert(seq![x, y].to_multiset() =~= seq![y, x].to_multiset()) by {
+        assert(seq![x, y] =~= seq![x] + seq![y]);
+        assert(seq![y, x] =~= seq![y] + seq![x]);
+        vstd::seq_lib::lemma_multiset_commutative(seq![x], seq![y]);
+        vstd::seq_lib::lemma_multiset_commutative(seq![y], seq![x]);
+    }
+}
+
+fn main() {}
+
+} // verus!

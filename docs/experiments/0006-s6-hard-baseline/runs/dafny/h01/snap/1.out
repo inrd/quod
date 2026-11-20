@@ -1,0 +1,10 @@
+
+
+h01_insertion_sort.dfy(19,14): Error: this invariant could not be proved to be maintained by the loop
+ Related message: loop invariant violation
+   |
+19 |     invariant forall a, b :: 0 <= a <= b < i && b < xs.Length ==> xs[a] <= xs[b]
+   |               ^^^^^^
+
+
+Dafny program verifier finished with 4 verified, 1 error

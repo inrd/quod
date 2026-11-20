@@ -1,0 +1,49 @@
+h07_pool_list_len.dfy(18,13): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+18 |     var T := set x | x in s[..|s|-1];
+   |              ^^^
+
+h07_pool_list_len.dfy(20,32): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+20 |     assert (set x | x in s) == (set x | x in s[..|s|-1]) + {s[|s|-1]};
+   |                                 ^^^
+
+h07_pool_list_len.dfy(21,13): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+21 |     assert |(set x | x in s[..|s|-1]) + {s[|s|-1]}| == |set x | x in s[..|s|-1]| + 1;
+   |              ^^^
+
+h07_pool_list_len.dfy(21,56): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+21 |     assert |(set x | x in s[..|s|-1]) + {s[|s|-1]}| == |set x | x in s[..|s|-1]| + 1;
+   |                                                         ^^^
+
+h07_pool_list_len.dfy(32,14): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+32 |   var full := set k: int | 0 <= k < n;
+   |               ^^^
+
+h07_pool_list_len.dfy(44,11): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+44 |   ensures |set k: int | 0 <= k < n| == n
+   |            ^^^
+
+h07_pool_list_len.dfy(49,12): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+49 |     assert (set k: int | 0 <= k < n) == (set k: int | 0 <= k < n - 1) + {n - 1};
+   |             ^^^
+
+h07_pool_list_len.dfy(49,41): Warning: Could not find a trigger for this quantifier. Without a trigger, the quantifier may cause brittle verification. To silence this warning, add an explicit trigger using the {:trigger} attribute. For more information, see the section on quantifier instantiation rules in the reference manual.
+   |
+49 |     assert (set k: int | 0 <= k < n) == (set k: int | 0 <= k < n - 1) + {n - 1};
+   |                                          ^^^
+
+
+
+h07_pool_list_len.dfy(21,4): Error: assertion might not hold
+   |
+21 |     assert |(set x | x in s[..|s|-1]) + {s[|s|-1]}| == |set x | x in s[..|s|-1]| + 1;
+   |     ^^^^^^
+
+
+Dafny program verifier finished with 9 verified, 1 error
