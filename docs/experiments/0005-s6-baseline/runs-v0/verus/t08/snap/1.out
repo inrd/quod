@@ -1,0 +1,32 @@
+error[E0277]: the size for values of type `[u32]` cannot be known at compilation time
+  --> t08_insert_sorted.rs:21:5
+   |
+21 |     let ghost old = *xs;
+   |     ^^^^^^^^^^^^^^^^^^^^ doesn't have a size known at compile-time
+   |
+   = help: the trait `std::marker::Sized` is not implemented for `[u32]`
+   = note: all local variables must have a statically known size
+   = note: this error originates in the macro `verus` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the size for values of type `[u32]` cannot be known at compilation time
+  --> t08_insert_sorted.rs:21:15
+   |
+21 |     let ghost old = *xs;
+   |               ^^^ doesn't have a size known at compile-time
+   |
+   = help: the trait `std::marker::Sized` is not implemented for `[u32]`
+   = note: all local variables must have a statically known size
+   = note: this error originates in the macro `verus` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the size for values of type `[u32]` cannot be known at compilation time
+  --> t08_insert_sorted.rs:21:15
+   |
+21 |     let ghost old = *xs;
+   |               ^^^ doesn't have a size known at compile-time
+   |
+   = help: the trait `std::marker::Sized` is not implemented for `[u32]`
+   = note: all local variables must have a statically known size
+
+error: aborting due to 3 previous errors
+
+For more information about this error, try `rustc --explain E0277`.

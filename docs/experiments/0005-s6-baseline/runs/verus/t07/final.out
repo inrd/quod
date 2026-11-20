@@ -1,0 +1,33 @@
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> t07_partition.rs:33:16
+   |
+33 |             xs.set(i, b);
+   |                ^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> t07_partition.rs:34:16
+   |
+34 |             xs.set(r, a);
+   |                ^^^
+
+verification results:: 3 verified, 0 errors
+warning: 2 warnings emitted
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> t07_partition.rs:33:16
+   |
+33 |             xs.set(i, b);
+   |                ^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> t07_partition.rs:34:16
+   |
+34 |             xs.set(r, a);
+   |                ^^^
+
+warning: 2 warnings emitted
+

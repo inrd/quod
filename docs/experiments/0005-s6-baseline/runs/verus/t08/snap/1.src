@@ -1,0 +1,44 @@
+// Experiment 0005 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+
+verus! {
+
+// SPEC-BEGIN
+fn insert_sorted(xs: &mut [u32], n: usize, v: u32) -> (r: usize)
+    requires
+        n < old(xs).len(),
+        forall|i: int, j: int| 0 <= i <= j < n ==> #[trigger] old(xs)[i] <= #[trigger] old(xs)[j],
+    ensures
+        final(xs).len() == old(xs).len(),
+        r <= n,
+        final(xs)[r as int] == v,
+        forall|k: int| 0 <= k < r ==> final(xs)[k] == old(xs)[k],
+        forall|k: int| r + 1 <= k < n + 1 ==> final(xs)[k] == old(xs)[k - 1],
+        forall|k: int| n + 1 <= k < final(xs).len() ==> final(xs)[k] == old(xs)[k],
+        forall|i: int, j: int| 0 <= i <= j < n + 1 ==> #[trigger] final(xs)[i] <= #[trigger] final(xs)[j],
+// SPEC-END
+{
+    let mut i = n;
+    while i > 0 && xs[i - 1] > v
+        invariant
+            i <= n,
+            n < xs.len(),
+            xs.len() == old(xs).len(),
+            forall|i: int, j: int| 0 <= i <= j < n ==> #[trigger] old(xs)[i] <= #[trigger] old(xs)[j],
+            forall|k: int| 0 <= k < i ==> xs[k] == old(xs)[k],
+            forall|k: int| i + 1 <= k < n + 1 ==> xs[k] == old(xs)[k - 1],
+            forall|k: int| i <= k < n ==> old(xs)[k] > v,
+            forall|k: int| n + 1 <= k < xs.len() ==> xs[k] == old(xs)[k],
+        decreasing i
+    {
+        let t = xs[i - 1];
+        xs.set(i, t);
+        i -= 1;
+    }
+    xs.set(i, v);
+    i
+}
+
+fn main() {}
+
+} // verus!

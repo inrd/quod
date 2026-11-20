@@ -1,0 +1,8 @@
+error: expected curly braces
+  --> t03_lower_bound.rs:24:20
+   |
+24 |         decreasing hi - lo
+   |                    ^^
+
+error: aborting due to 1 previous error
+

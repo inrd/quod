@@ -1,0 +1,9 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn partition(xs: &mut [u32], pivot: u32) -> usize
+    effects {}
+    ensures result <= xs.len
+    ensures forall k: int in 0..result { xs[k] < pivot }
+    ensures forall k: int in result..xs.len { xs[k] >= pivot }
+{
+    return ?h;
+}

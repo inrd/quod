@@ -1,0 +1,9 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn max_index(xs: &[u32]) -> usize
+    effects {}
+    requires xs.len > 0
+    ensures result < xs.len
+    ensures forall k: int in 0..xs.len { xs[k] <= xs[result] }
+{
+    return ?h;
+}

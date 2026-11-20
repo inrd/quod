@@ -1,0 +1,14 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+// Pool free list: next[k] is the link of node k, next.len is the null index;
+// free[0] is the free-list head (no &mut T in the slice, so a 1-element slice).
+pub fn pool_alloc(next: &[usize], free: &mut [usize]) -> usize
+    effects {}
+    requires free.len == 1
+    requires free[0] <= next.len
+    requires forall k: int in 0..next.len { next[k] <= next.len }
+    ensures old(free[0]) == next.len ==> result == next.len && free[0] == next.len
+    ensures old(free[0]) < next.len ==> result == old(free[0]) && free[0] == next[result]
+    ensures free[0] <= next.len
+{
+    return ?h;
+}

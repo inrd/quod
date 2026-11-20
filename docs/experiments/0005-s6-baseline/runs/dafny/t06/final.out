@@ -1,0 +1,9 @@
+
+
+t06_scale.dfy(19,19): Error: value does not satisfy the subset constraints of 'u32'
+   |
+19 |     xs[i] := xs[i] * f;
+   |                    ^
+
+
+Dafny program verifier finished with 3 verified, 1 error

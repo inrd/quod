@@ -1,0 +1,7 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn reverse(xs: &mut [u32]) -> ()
+    effects {}
+    ensures forall k: int in 0..xs.len { xs[k] == old(xs[xs.len - 1 - k]) }
+{
+    return ?h;
+}

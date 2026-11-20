@@ -1,0 +1,36 @@
+// Experiment 0005 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+
+verus! {
+
+// SPEC-BEGIN
+fn reverse(xs: &mut [u32])
+    ensures
+        final(xs).len() == old(xs).len(),
+        forall|k: int| 0 <= k < final(xs).len() ==> final(xs)[k] == old(xs)[final(xs).len() - 1 - k],
+// SPEC-END
+{
+    let n = xs.len();
+    let mut i: usize = 0;
+    while i < n / 2
+        invariant
+            n == xs.len(),
+            xs.len() == old(xs).len(),
+            i <= n / 2,
+            forall|k: int| 0 <= k < i ==> xs[k] == old(xs)[n - 1 - k],
+            forall|k: int| 0 <= k < i ==> xs[n - 1 - k] == old(xs)[k],
+            forall|k: int| i <= k < n - i ==> xs[k] == old(xs)[k],
+        decreases n / 2 - i,
+    {
+        let j = n - 1 - i;
+        let a = xs[i];
+        let b = xs[j];
+        xs.set(i, b);
+        xs.set(j, a);
+        i += 1;
+    }
+}
+
+fn main() {}
+
+} // verus!

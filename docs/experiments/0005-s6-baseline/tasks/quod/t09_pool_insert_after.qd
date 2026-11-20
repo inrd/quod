@@ -1,0 +1,16 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+// Pool of nodes as parallel arrays (no structs in the slice); links are indices.
+pub fn pool_insert_after(next: &mut [usize], val: &mut [u32], node: usize, slot: usize, v: u32) -> ()
+    effects {}
+    requires next.len == val.len
+    requires node < next.len
+    requires slot < next.len
+    requires node != slot
+    ensures next[node] == slot
+    ensures next[slot] == old(next[node])
+    ensures val[slot] == v
+    ensures forall k: int in 0..next.len { (k != node && k != slot) ==> next[k] == old(next[k]) }
+    ensures forall k: int in 0..val.len { k != slot ==> val[k] == old(val[k]) }
+{
+    return ?h;
+}

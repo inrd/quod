@@ -1,0 +1,10 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn copy_at(dst: &mut [u32], src: &[u32], off: usize) -> ()
+    effects {}
+    requires off + src.len <= dst.len
+    ensures forall k: int in 0..src.len { dst[off + k] == src[k] }
+    ensures forall k: int in 0..off { dst[k] == old(dst[k]) }
+    ensures forall k: int in off + src.len..dst.len { dst[k] == old(dst[k]) }
+{
+    return ?h;
+}

@@ -1,0 +1,45 @@
+error[E0599]: no method named `set` found for mutable reference `&mut [usize]` in the current scope
+  --> t09_pool_insert_after.rs:25:10
+   |
+25 |     next.set(slot, old_next);
+   |          ^^^
+   |
+   = help: items from traits can only be used if the trait is in scope
+help: there is a method `get` with a similar name, but with different arguments
+  --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/mod.rs:572:4
+help: trait `SliceAdditionalExecFns` which provides `set` is implemented but not in scope; perhaps you want to import it
+   |
+ 2 + use vstd::slice::SliceAdditionalExecFns;
+   |
+
+error[E0599]: no method named `set` found for mutable reference `&mut [usize]` in the current scope
+  --> t09_pool_insert_after.rs:26:10
+   |
+26 |     next.set(node, slot);
+   |          ^^^
+   |
+   = help: items from traits can only be used if the trait is in scope
+help: there is a method `get` with a similar name, but with different arguments
+  --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/mod.rs:572:4
+help: trait `SliceAdditionalExecFns` which provides `set` is implemented but not in scope; perhaps you want to import it
+   |
+ 2 + use vstd::slice::SliceAdditionalExecFns;
+   |
+
+error[E0599]: no method named `set` found for mutable reference `&mut [u32]` in the current scope
+  --> t09_pool_insert_after.rs:27:9
+   |
+27 |     val.set(slot, v);
+   |         ^^^
+   |
+   = help: items from traits can only be used if the trait is in scope
+help: there is a method `get` with a similar name, but with different arguments
+  --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/mod.rs:572:4
+help: trait `SliceAdditionalExecFns` which provides `set` is implemented but not in scope; perhaps you want to import it
+   |
+ 2 + use vstd::slice::SliceAdditionalExecFns;
+   |
+
+error: aborting due to 3 previous errors
+
+For more information about this error, try `rustc --explain E0599`.

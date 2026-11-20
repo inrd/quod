@@ -1,0 +1,8 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn all_below(xs: &[u32], bound: u32) -> bool
+    effects {}
+    ensures result ==> forall k: int in 0..xs.len { xs[k] < bound }
+    ensures !result ==> exists k: int in 0..xs.len { xs[k] >= bound }
+{
+    return ?h;
+}

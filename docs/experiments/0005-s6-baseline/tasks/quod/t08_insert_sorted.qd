@@ -1,0 +1,14 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn insert_sorted(xs: &mut [u32], n: usize, v: u32) -> usize
+    effects {}
+    requires n < xs.len
+    requires forall i: int in 0..n { forall j: int in i..n { xs[i] <= xs[j] } }
+    ensures result <= n
+    ensures xs[result] == v
+    ensures forall k: int in 0..result { xs[k] == old(xs[k]) }
+    ensures forall k: int in result + 1..n + 1 { xs[k] == old(xs[k - 1]) }
+    ensures forall k: int in n + 1..xs.len { xs[k] == old(xs[k]) }
+    ensures forall i: int in 0..n + 1 { forall j: int in i..n + 1 { xs[i] <= xs[j] } }
+{
+    return ?h;
+}

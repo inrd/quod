@@ -1,0 +1,44 @@
+// Experiment 0005 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+use vstd::slice::SliceAdditionalExecFns;
+
+verus! {
+
+// Rearranges xs in place (a permutation; not stated in the spec, which
+// matches the Quod slice subset, but required of the implementation).
+// SPEC-BEGIN
+fn partition(xs: &mut [u32], pivot: u32) -> (r: usize)
+    ensures
+        final(xs).len() == old(xs).len(),
+        r <= final(xs).len(),
+        forall|k: int| 0 <= k < r ==> final(xs)[k] < pivot,
+        forall|k: int| r <= k < final(xs).len() ==> final(xs)[k] >= pivot,
+// SPEC-END
+{
+    let n = xs.len();
+    let mut r: usize = 0;
+    let mut i: usize = 0;
+    while i < n
+        invariant
+            n == xs.len(),
+            n == old(xs).len(),
+            r <= i <= n,
+            forall|k: int| 0 <= k < r ==> xs[k] < pivot,
+            forall|k: int| r <= k < i ==> xs[k] >= pivot,
+        decreases n - i,
+    {
+        if xs[i] < pivot {
+            let a = xs[i];
+            let b = xs[r];
+            xs.set(i, b);
+            xs.set(r, a);
+            r += 1;
+        }
+        i += 1;
+    }
+    r
+}
+
+fn main() {}
+
+} // verus!

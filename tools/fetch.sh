@@ -3,6 +3,7 @@
 #
 #   tools/fetch.sh            cvc5, Ethos and the CPC signature
 #   tools/fetch.sh carcara    also build Carcara from its pinned commit (needs cargo)
+#   tools/fetch.sh baseline   Dafny and Verus (experiment 0005)
 #   tools/fetch.sh all        everything
 #
 # Every download is checked against the SHA-256 in tools/pins.sh before it is
@@ -15,9 +16,12 @@ CACHE=$HERE/.cache
 mkdir -p "$BIN" "$CACHE"
 
 case "$(uname -s)-$(uname -m)" in
-  Darwin-arm64) PLAT=macOS_arm64; CVC5_ASSET=cvc5-macOS-arm64-static; ETHOS_ASSET=ethos-macOS-arm64 ;;
-  Linux-x86_64) PLAT=Linux_x86_64; CVC5_ASSET=cvc5-Linux-x86_64-static; ETHOS_ASSET=ethos-linux-x86_64 ;;
-  Linux-aarch64 | Linux-arm64) PLAT=Linux_arm64; CVC5_ASSET=cvc5-Linux-arm64-static; ETHOS_ASSET=ethos-linux-arm64 ;;
+  Darwin-arm64) PLAT=macOS_arm64; CVC5_ASSET=cvc5-macOS-arm64-static; ETHOS_ASSET=ethos-macOS-arm64
+    DAFNY_ASSET=dafny-$DAFNY_VERSION-arm64-macos-13; VERUS_ASSET=verus-$VERUS_VERSION-arm64-macos ;;
+  Linux-x86_64) PLAT=Linux_x86_64; CVC5_ASSET=cvc5-Linux-x86_64-static; ETHOS_ASSET=ethos-linux-x86_64
+    DAFNY_ASSET=dafny-$DAFNY_VERSION-x64-ubuntu-22.04; VERUS_ASSET=verus-$VERUS_VERSION-x86-linux ;;
+  Linux-aarch64 | Linux-arm64) PLAT=Linux_arm64; CVC5_ASSET=cvc5-Linux-arm64-static; ETHOS_ASSET=ethos-linux-arm64
+    DAFNY_ASSET=; VERUS_ASSET=verus-$VERUS_VERSION-arm64-linux ;;
   *) echo "fetch.sh: unsupported platform $(uname -s)-$(uname -m)" >&2; exit 1 ;;
 esac
 
@@ -84,14 +88,41 @@ fetch_carcara() {
   stamp carcara "$CARCARA_REV"
 }
 
+# Dafny and Verus are whole directories (runtime, bundled Z3); bin/dafny and
+# bin/verus are wrappers that call into them.
+fetch_dafny() {
+  installed dafny "$DAFNY_VERSION" && return
+  [ -n "$DAFNY_ASSET" ] || { echo "fetch.sh: no Dafny release for $PLAT" >&2; exit 1; }
+  eval "want=\$DAFNY_SHA256_$PLAT"
+  download "$DAFNY_URL/$DAFNY_ASSET.zip" "$CACHE/dafny.zip" "$want"
+  rm -rf "$BIN/dafny-dist" && mkdir -p "$BIN/dafny-dist"
+  unzip -q "$CACHE/dafny.zip" -d "$BIN/dafny-dist"
+  printf '#!/bin/sh\nexec "%s/dafny-dist/dafny/dafny" "$@"\n' "$BIN" >"$BIN/dafny"
+  chmod 755 "$BIN/dafny"
+  stamp dafny "$DAFNY_VERSION"
+}
+
+fetch_verus() {
+  installed verus "$VERUS_VERSION" && return
+  eval "want=\$VERUS_SHA256_$PLAT"
+  download "$VERUS_URL/$VERUS_ASSET.zip" "$CACHE/verus.zip" "$want"
+  rm -rf "$BIN/verus-dist" && mkdir -p "$BIN/verus-dist"
+  unzip -q "$CACHE/verus.zip" -d "$BIN/verus-dist"
+  dir=$(cd "$BIN/verus-dist"/*/ && pwd)
+  printf '#!/bin/sh\nexec "%s/verus" "$@"\n' "$dir" >"$BIN/verus"
+  chmod 755 "$BIN/verus"
+  stamp verus "$VERUS_VERSION"
+}
+
 case "${1:-default}" in
   default) fetch_cvc5; fetch_ethos; fetch_cpc ;;
   carcara) fetch_cvc5; fetch_ethos; fetch_cpc; fetch_carcara ;;
-  all) fetch_cvc5; fetch_ethos; fetch_cpc; fetch_carcara ;;
-  *) echo "usage: tools/fetch.sh [carcara|all]" >&2; exit 2 ;;
+  baseline) fetch_dafny; fetch_verus ;;
+  all) fetch_cvc5; fetch_ethos; fetch_cpc; fetch_carcara; fetch_dafny; fetch_verus ;;
+  *) echo "usage: tools/fetch.sh [carcara|baseline|all]" >&2; exit 2 ;;
 esac
 
 echo "tools/bin:"
-for t in cvc5 ethos cpc carcara; do
+for t in cvc5 ethos cpc carcara dafny verus; do
   if [ -e "$BIN/.$t" ]; then printf '  %-8s %s\n' "$t" "$(cat "$BIN/.$t")"; fi
 done

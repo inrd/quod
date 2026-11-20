@@ -1,0 +1,30 @@
+
+
+
+
+
+
+
+
+t04_reverse.dfy(17,43): Error: index out of range
+   |
+17 |     invariant forall k :: 0 <= k < i ==> xs[k] == old(xs[n - 1 - k]) && xs[n - 1 - k] == old(xs[k])
+   |                                            ^
+
+t04_reverse.dfy(17,56): Error: index out of range
+   |
+17 |     invariant forall k :: 0 <= k < i ==> xs[k] == old(xs[n - 1 - k]) && xs[n - 1 - k] == old(xs[k])
+   |                                                         ^
+
+t04_reverse.dfy(17,74): Error: index out of range
+   |
+17 |     invariant forall k :: 0 <= k < i ==> xs[k] == old(xs[n - 1 - k]) && xs[n - 1 - k] == old(xs[k])
+   |                                                                           ^
+
+t04_reverse.dfy(17,95): Error: index out of range
+   |
+17 |     invariant forall k :: 0 <= k < i ==> xs[k] == old(xs[n - 1 - k]) && xs[n - 1 - k] == old(xs[k])
+   |                                                                                                ^
+
+
+Dafny program verifier finished with 3 verified, 4 errors

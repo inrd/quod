@@ -1,0 +1,10 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn lower_bound(xs: &[u32], key: u32) -> usize
+    effects {}
+    requires forall i: int in 0..xs.len { forall j: int in i..xs.len { xs[i] <= xs[j] } }
+    ensures result <= xs.len
+    ensures forall k: int in 0..result { xs[k] < key }
+    ensures forall k: int in result..xs.len { xs[k] >= key }
+{
+    return ?h;
+}

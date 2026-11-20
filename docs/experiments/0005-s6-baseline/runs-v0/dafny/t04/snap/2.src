@@ -1,0 +1,27 @@
+// Experiment 0005 baseline task. Do not edit between SPEC-BEGIN and SPEC-END.
+type u32 = x: int | 0 <= x < 0x1_0000_0000
+type usize = x: int | 0 <= x < 0x1_0000_0000_0000_0000
+
+// SPEC-BEGIN
+method reverse(xs: array<u32>)
+  requires xs.Length < 0x1_0000_0000_0000_0000
+  modifies xs
+  ensures forall k :: 0 <= k < xs.Length ==> xs[k] == old(xs[xs.Length - 1 - k])
+// SPEC-END
+{
+  var n := xs.Length;
+  var i := 0;
+  while i < n - 1 - i
+    invariant 0 <= i
+    invariant i <= n
+    invariant n == xs.Length
+    invariant forall k :: 0 <= k < i ==> xs[k] == old(xs[n - 1 - k]) && xs[n - 1 - k] == old(xs[k])
+    invariant forall k :: i <= k < n - i ==> xs[k] == old(xs[k])
+    decreases n - 1 - i - i
+  {
+    var t := xs[i];
+    xs[i] := xs[n - 1 - i];
+    xs[n - 1 - i] := t;
+    i := i + 1;
+  }
+}

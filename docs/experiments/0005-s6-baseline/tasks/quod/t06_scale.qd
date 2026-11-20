@@ -1,0 +1,8 @@
+// PROVISIONAL SYNTAX — experiment 0005 task, non-normative.
+pub fn scale(xs: &mut [u32], f: u32) -> ()
+    effects {}
+    requires forall k: int in 0..xs.len { xs[k] * f <= 4294967295 }
+    ensures forall k: int in 0..xs.len { xs[k] == old(xs[k]) * f }
+{
+    return ?h;
+}

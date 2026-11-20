@@ -5,6 +5,7 @@ Pinned versions of the solvers and checkers used by [experiments](../docs/experi
 ```sh
 tools/fetch.sh            # cvc5, Ethos, CPC signature  (~25 MB download)
 tools/fetch.sh carcara    # also build Carcara from source (needs cargo, ~2–3 min)
+tools/fetch.sh baseline   # Dafny and Verus for experiment 0005 (~85 MB; Verus also needs its Rust toolchain via rustup)
 ```
 
 Everything lands in `tools/bin/` (git-ignored). Each download is checked against the SHA-256 in [pins.sh](pins.sh) before it is unpacked; a mismatch stops the script. Re-running skips tools already at the pinned version.
@@ -15,6 +16,8 @@ Everything lands in `tools/bin/` (git-ignored). Each download is checked against
 | `ethos` | 0.2.5 | official release; the exact commit cvc5 1.4.2 pins | checking CPC proofs |
 | `cpc/` | from cvc5 1.4.2 source | `proofs/eo/cpc` | the CPC signature Ethos checks against |
 | `carcara` | commit `819f309` | built with `cargo install --locked` | checking and elaborating Alethe proofs |
+| `dafny` | 4.11.0 (bundled Z3) | official release | S6 baseline ([experiment 0005](../docs/experiments/0005-s6-baseline.md)) |
+| `verus` | 0.2026.11.02.8bf68ee | official release; needs Rust 1.99.1 | S6 baseline |
 
 Platforms: macOS arm64, Linux x86_64, Linux arm64.
 

@@ -29,3 +29,17 @@ ETHOS_SHA256_Linux_arm64=736eb758f69da12a72962ee0bf9203127f82267ec54668162b2b17f
 # from source with its own Cargo.lock (--locked).
 CARCARA_REPO=https://github.com/ufmg-smite/carcara
 CARCARA_REV=819f30914665019898cbad7e09d3962053b6f97a
+
+# Dafny and Verus: baseline verifiers for experiment 0005 (ADR-0006 S6).
+# Official release zips; each bundles its own Z3. Verus also needs the Rust
+# toolchain it names (installed through rustup on first run).
+DAFNY_VERSION=4.11.0
+DAFNY_URL=https://github.com/dafny-lang/dafny/releases/download/v$DAFNY_VERSION
+DAFNY_SHA256_macOS_arm64=c90c75e7d5db9c6ccbb7127840dfe43f0ac938b039a7ebed146d8ead383a572f
+DAFNY_SHA256_Linux_x86_64=a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179
+
+VERUS_VERSION=0.2026.11.02.8bf68ee
+VERUS_URL=https://github.com/verus-lang/verus/releases/download/release/$VERUS_VERSION
+VERUS_SHA256_macOS_arm64=3086974d1afebf8b9f6fee2939b626486a12248c0dab528b9262ea652b863326
+VERUS_SHA256_Linux_x86_64=f3a0119292df8855e4435da8130bee1873b0e6a60c306accf81a08ea687bba3c
+VERUS_SHA256_Linux_arm64=bc28850dd5efd1679a4cf4ffd3309921c3523c69fa4757079e5d12d4122d400d
