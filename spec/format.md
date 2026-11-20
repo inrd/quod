@@ -10,7 +10,9 @@ The formatter defines layout; whitespace is not significant to the AST. Required
 |---|---|
 | Indentation | 4 spaces; no tabs; no trailing whitespace; file ends with one newline |
 | Items | separated by exactly one blank line |
-| `fn` | signature on one line; `effects { … }` on the next line, indented once; body `{` on its own line |
+| `fn` | signature on one line; `effects { … }` on the next line, indented once; then each `requires`/`ensures` clause on its own line, indented once; body `{` on its own line |
+| `while` | `while c` on one line; each `invariant` and the `decreases` clause on its own line, indented once relative to `while`; `{` on its own line at the `while`'s indentation |
+| Quantifier | `forall k: int in lo..hi { e }` on one line, one space inside the braces |
 | `type` | one field per line, each followed by `,` |
 | Blocks | one statement per line; empty block is `{}` |
 | `if` / `else` | `} else {` and `} else if c {` on the closing-brace line |

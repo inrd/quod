@@ -4,7 +4,7 @@
 
 ## 1. Scope
 
-Phase 1 checks a **single file** of `type` and `fn` items with no contracts. The checker has no proofs: each code-side precondition from ADR-0002 that is not statically trivial becomes a **runtime trap** listed in the *unverified checks* report (§11).
+Phase 1 checks a **single file** of `type` and `fn` items. Contracts, `while` loops and spec contexts are specified separately in [contracts.md](contracts.md) (thin slice, [ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)); this document covers code. The checker has no proofs: each code-side precondition from ADR-0002 that is not statically trivial becomes a **runtime trap** listed in the *unverified checks* report (§11).
 
 Not checked in phase 1. Each of these parses but is rejected with `E0318`, so the [open questions](../docs/open-questions.md) stay open:
 
@@ -13,7 +13,7 @@ Not checked in phase 1. Each of these parses but is rejected with `E0318`, so th
 | Generic parameters on `fn`/`type`, generic arguments, `id::<T>` | [open-questions §7](../docs/open-questions.md#7-generics-and-compile-time-evaluation) undecided | by ADR |
 | `mod`, `use` | multi-file compilation not designed | by ADR |
 | Non-empty `effects { … }` | effect system | phase 4 |
-| `int`, `nat` | spec-only types; phase 1 has no spec contexts | phase 2 |
+| `int` outside a quantifier binder, `nat` | spec-only types; the slice needs `int` only as a binder ([contracts.md §5.1](contracts.md#51-types-and-literals)) | phase 2 |
 | Named array lengths `[T; N]` | needs const generics or const items | by ADR |
 | Recursion (direct or mutual) | needs `decreases` | phase 2 |
 
@@ -115,12 +115,13 @@ Example: `x < 5` or `(a + 1) == b`. Synthesize the operand that is not an unsuff
 | `place op= e;` | same as `place = place op e` with `place` evaluated once; traps as for `op` |
 | `if c { … } else { … }` | `c: bool` |
 | `for i: T in a..b { … }` | `T` integer type; `a`, `b` checked against `T`; both evaluated once at loop entry, left to right; iterates `a, a+1, …, b-1`; zero iterations if `a >= b` (no trap); `i` is immutable |
-| `break;`, `continue;` | only inside a `for` body (`E0315`) |
+| `while c … { … }` | `c: bool`, evaluated before each iteration; clauses per [contracts.md §4](contracts.md#4-while-loops) |
+| `break;`, `continue;` | only inside a `for` or `while` body (`E0315`) |
 | `return e;` | `e` checked against the return type |
 | `e;` | `e` must be a call returning `()` (`E0316`). Discarding a non-unit result is an error ([Power of 10 rule 7](../docs/power-of-10-mapping.md)); there is no discard construct yet |
 | `{ … }` | new scope |
 
-**Definite return:** a function whose return type is not `()` must end in a statement that always returns. A statement *always returns* if it is a `return`, a block whose last statement always returns, or an `if` with an `else` whose branches both always return. A `for` never counts. Otherwise the error is `E0313`. A `()` function may fall off the end.
+**Definite return:** a function whose return type is not `()` must end in a statement that always returns. A statement *always returns* if it is a `return`, a block whose last statement always returns, or an `if` with an `else` whose branches both always return. A `for` or `while` never counts. Otherwise the error is `E0313`. A `()` function may fall off the end.
 
 **No dead code:** a statement that follows a `return`, `break` or `continue`, or an always-returning statement, in the same block is `E0314`.
 
@@ -201,7 +202,7 @@ Nothing else is elided in phase 1: no flow facts, no constant propagation. Phase
 
 **Trap behavior:** the program terminates and does not return to the caller. It is not a `panic` effect ([ADR-0002](../docs/adr/0002-arithmetic-semantics.md#consequences)). The exact mechanism (e.g. `abort()` after a message naming the check) belongs to the C emitter spec.
 
-**Report:** one entry per trap site and kind, in source order (`quodc check`): `file:line:col`, enclosing function, kind (`overflow`, `negate`, `div-zero`, `div-overflow`, `shift`, `cast`, `bounds`, `slice`), operand type(s). It is plain text in phase 1, with a stable ordering suitable for diffing. Phase 3 adds a JSON form.
+**Report:** one entry per trap site and kind, in source order (`quodc check`): `file:line:col`, enclosing function, kind (`overflow`, `negate`, `div-zero`, `div-overflow`, `shift`, `cast`, `bounds`, `slice`), operand type(s). Contract clauses add one entry each, with kind `requires`, `ensures`, `invariant` or `decreases` and no operand types ([contracts.md §6](contracts.md#6-phase-1-behavior)). It is plain text in phase 1, with a stable ordering suitable for diffing. Phase 3 adds a JSON form.
 
 ## 12. Diagnostics
 
@@ -215,6 +216,7 @@ In [grammar-draft.md](grammar-draft.md) (provisional) and implemented in the par
 |---|---|---|
 | G1 | `unary = ( "-" \| "!" ) unary \| "&" [ "mut" ] unary \| cast_expr ;` (`&&` in unary position is a syntax error) | Creating reference arguments (§8.1) |
 | G2 | `postfix` index: `"[" expr ( "]" \| ".." expr "]" )` | Array → slice (ADR-0004, Q2) |
+| G3 | `requires`/`ensures` on `fn`, `while_stmt`, `==>`, `result`, `old(e)`, quantifiers | Contracts for the slice ([contracts.md §8](contracts.md#8-grammar-and-diagnostics-changes)); not yet in the parser |
 
 ## 14. Decided points (ADR-0004)
 

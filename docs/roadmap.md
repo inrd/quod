@@ -24,7 +24,7 @@ The narrowest path from source to a kernel-checked function, built before phase 
 | Step | Scope | Status |
 |---|---|---|
 | S1 | Elaboration spike: cvc5 certificates against kernel rules | done ([experiment 0001](experiments/0001-alethe-elaboration.md); ADR-0003 superseded by Proposed ADR-0008) |
-| S2 | Slice subset in `spec/`: `u32`, `u64`, `usize`, `bool`, fixed arrays, `&`/`&mut` slices, `while` with `invariant`, `requires`/`ensures` | next |
+| S2 | Slice subset in `spec/`: `u32`, `u64`, `usize`, `bool`, fixed arrays, `&`/`&mut` slices, `while` with `invariant`, `requires`/`ensures` | spec written ([contracts.md](../spec/contracts.md)); parser and checker next |
 | S2b | Core IR for the slice and its canonical text (`spec/core-ir.md`); front end lowers to it | — |
 | S3 | `cgen` over Core IR, phase-1 traps; C accepted by gcc, clang, CompCert (gate for ADR-0010) | — |
 | S4a | `vcgen`, elaborator prototype, stand-in checkers (Carcara, Ethos); experiment 0004 (gates for ADR-0007, ADR-0008) | — |

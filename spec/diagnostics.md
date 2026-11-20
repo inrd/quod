@@ -63,3 +63,10 @@ Specified in [typing.md](typing.md); implemented in `compiler/src/check.rs`.
 | `E0323` | Array literal length does not match the expected type. |
 | `E0324` | Struct contains itself by value. |
 | `E0325` | Range index `p[lo..hi]` not directly under `&`/`&mut`. |
+
+## Planned
+
+Specified but not yet implemented. Each code moves into the table above, with a variant in `compiler/src/diag.rs`, in the change that implements it. Until then its number is reserved.
+
+- **E0326–E0329**: spec-context errors ([contracts.md §8](contracts.md#8-grammar-and-diagnostics-changes)).
+- When contracts are implemented, `E0202` no longer covers `requires ensures invariant decreases old result forall exists`, `E0206` no longer covers `while`, and `E0318` also covers a quantifier binder whose type is not `int`.
