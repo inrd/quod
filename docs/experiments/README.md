@@ -1,6 +1,6 @@
 # Experiments
 
-Spikes that test design assumptions before code depends on them. Each has a report `NNNN-title.md` and, if it has inputs or scripts, a directory of the same name. Reports are evidence for ADRs; they decide nothing on their own.
+Spikes that test design assumptions before code depends on them. Each has a report `NNNN-title.md` and, if it has inputs or scripts, a directory of the same name. Reports are evidence for ADRs; they decide nothing on their own. Solvers and checkers are pinned in [`tools/`](../../tools/README.md): run `tools/fetch.sh` once, then pass `tools/bin/cvc5` to the experiment scripts.
 
 | # | Question | Result |
 |---|---|---|

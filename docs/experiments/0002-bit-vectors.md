@@ -24,7 +24,7 @@ For each route, the experiment asks three things:
 
 | Item | Value |
 |---|---|
-| Solver | cvc5 1.4.2 (official macOS arm64 static release), as in experiments 0001 and 0003 |
+| Solver | cvc5 1.4.2 (official macOS arm64 static release; [`tools/fetch.sh`](../../tools/README.md) installs it as `tools/bin/cvc5`), as in experiments 0001 and 0003 |
 | Flags | as experiment 0001 (`--proof-granularity=dsl-rewrite`, `--tlimit=30000`); Alethe, and CPC for route (b) |
 | Not run | Carcara, Ethos, a Quod kernel. Proofs were classified, not checked. |
 
@@ -155,7 +155,7 @@ Update ADR-0008 §4 (still Proposed) to route (a). These changes have been appli
 
 ```bash
 docs/experiments/0002-bit-vectors/gen.sh
-docs/experiments/0002-bit-vectors/run.sh /path/to/cvc5 docs/experiments/0002-bit-vectors/lemma-library /tmp/a2
+docs/experiments/0002-bit-vectors/run.sh tools/bin/cvc5 docs/experiments/0002-bit-vectors/lemma-library /tmp/a2
 docs/experiments/0002-bit-vectors/classify.sh /tmp/a2
-docs/experiments/0002-bit-vectors/run.sh /path/to/cvc5 docs/experiments/0002-bit-vectors/bitblast/w64 /tmp/b64 --proof-format-mode=cpc
+docs/experiments/0002-bit-vectors/run.sh tools/bin/cvc5 docs/experiments/0002-bit-vectors/bitblast/w64 /tmp/b64 --proof-format-mode=cpc
 ```

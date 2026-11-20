@@ -14,7 +14,7 @@ ADR-0003 assumes that solver certificates elaborate into a strict, search-free r
 
 | Item | Value |
 |---|---|
-| Solver | cvc5 1.4.2 (official macOS arm64 static release) |
+| Solver | cvc5 1.4.2 (official macOS arm64 static release; [`tools/fetch.sh`](../../tools/README.md) installs it as `tools/bin/cvc5`) |
 | Alethe flags | `--dump-proofs --proof-format-mode=alethe --proof-granularity=dsl-rewrite --tlimit=30000` |
 | CPC flags | same with `--proof-format-mode=cpc` |
 | Corpus | 61 hand-written refutational obligations shaped like phase-1/2 code (each asserts hypotheses and the negated goal; expected `unsat`) |
@@ -120,6 +120,6 @@ Open a superseding ADR for ADR-0003 (drafted as [ADR-0008](../adr/0008-kernel-ru
 ## Reproduce
 
 ```bash
-docs/experiments/0001-alethe-elaboration/run.sh /path/to/cvc5 /tmp/out > summary.tsv
+docs/experiments/0001-alethe-elaboration/run.sh tools/bin/cvc5 /tmp/out > summary.tsv
 docs/experiments/0001-alethe-elaboration/classify.sh /tmp/out
 ```

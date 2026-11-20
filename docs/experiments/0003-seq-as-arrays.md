@@ -32,7 +32,7 @@ Indices outside `[0, len)` are unconstrained. Array `=` would also constrain the
 
 | Item | Value |
 |---|---|
-| Solver | cvc5 1.4.2 (official macOS arm64 static release), same as experiment 0001 |
+| Solver | cvc5 1.4.2 (official macOS arm64 static release; [`tools/fetch.sh`](../../tools/README.md) installs it as `tools/bin/cvc5`), same as experiment 0001 |
 | Flags | as experiment 0001 (`--proof-granularity=dsl-rewrite`, `--tlimit=30000`), Alethe and CPC; each also with `--enum-inst` |
 | Not run | Carcara, Ethos, a Quod kernel. Proofs were classified, not checked. |
 
@@ -134,7 +134,7 @@ Update ADR-0008 §5 (still Proposed) as follows. These changes have been applied
 ## Reproduce
 
 ```bash
-docs/experiments/0003-seq-as-arrays/run.sh /path/to/cvc5 /tmp/a --enum-inst > summary.tsv
+docs/experiments/0003-seq-as-arrays/run.sh tools/bin/cvc5 /tmp/a --enum-inst > summary.tsv
 docs/experiments/0003-seq-as-arrays/classify.sh /tmp/a
-docs/experiments/0003-seq-as-arrays/run.sh /path/to/cvc5 /tmp/c --proof-format-mode=cpc --enum-inst
+docs/experiments/0003-seq-as-arrays/run.sh tools/bin/cvc5 /tmp/c --proof-format-mode=cpc --enum-inst
 ```

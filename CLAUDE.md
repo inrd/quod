@@ -37,6 +37,7 @@ Read the relevant ADR before working on the area it covers.
 | `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, CLI |
 | `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
 | `tests/` | `.qd` test corpus; `parse/` and `typecheck/` are run by `compiler/tests/` |
+| `tools/` | Pinned external tools for experiments (cvc5, Ethos, CPC signature, Carcara): `tools/fetch.sh` installs them into git-ignored `tools/bin/`; `tools/check-cpc.sh` checks one obligation's CPC proof |
 | `xtask/` | Repository checks (`cargo xtask lint`): links and anchors, ADR index, diagnostics registry, `.qd` headers, trusted-crate budgets. Tooling, not part of the compiler |
 | `.claude/` | Agent setup: permission allowlist, Stop hook (`hooks/check.sh`: fmt check + `cargo xtask lint` when the tree changed), `/accept-adr` skill |
 
