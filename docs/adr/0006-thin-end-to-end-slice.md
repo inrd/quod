@@ -1,8 +1,8 @@
 # ADR-0006: Build a thin end-to-end slice before widening phases 1–3
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-19
-- **Deciders:** —
+- **Deciders:** project maintainer (accepted 2026-11-20)
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** none. Amends the order of work in [roadmap.md](../roadmap.md); phase exit criteria are unchanged.
 - **Depends on:** [ADR-0008](0008-kernel-rules-from-real-certificates.md) (kernel logic and proof format; supersedes ADR-0003); S2b–S4b build to [ADR-0007](0007-trusted-obligation-generator.md), ADR-0008 and [ADR-0010](0010-trusted-c-emitter-from-core-ir.md) (all Proposed) under [ADR-0012](0012-evidence-before-acceptance.md)'s rule for gated designs

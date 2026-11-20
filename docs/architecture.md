@@ -95,11 +95,20 @@ What this requires beyond the kernel:
 | Artifact | Producer | Consumer |
 |---|---|---|
 | `.qd` source (canonical) | agent / human | front end |
-| proofs (Alethe-subset text, keyed by obligation ID + fingerprint) | agent / elaborator | kernel |
+| certificates (Alethe-subset text, stored next to the source, keyed by obligation ID + fingerprint) | `quodc prove` (solver + elaborator), or hand-written via `proof/submit` | kernel, in `quodc check` |
 | obligation list (JSON) | obligation generator | oracle, agent |
 | human report (per module) | report generator | human |
 | trust report (per build) | report generator | human, CI |
 | `.c` output | C emitter | C compiler |
+
+### Commands ([ADR-0009](adr/0009-prove-check-split.md))
+
+| Command | Does | Deterministic | Trusted |
+|---|---|---|---|
+| `quodc prove` | runs the obligation generator, solver and elaborator on obligations whose stored certificate is missing or stale; writes certificates | no | no |
+| `quodc check` | runs the obligation generator and kernel on stored certificates; never calls a solver | yes | kernel + obligation generator |
+
+CI and release builds run `check` only. The build verdict depends only on source, stored certificates and compiler version.
 
 ## Determinism
 

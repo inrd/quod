@@ -1,6 +1,6 @@
 # Experiments
 
-Spikes that test design assumptions before code depends on them. Each has a report `NNNN-title.md` and, if it has inputs or scripts, a directory of the same name. Reports are evidence for ADRs; they decide nothing on their own. Solvers and checkers are pinned in [`tools/`](../../tools/README.md): run `tools/fetch.sh` once, then pass `tools/bin/cvc5` to the experiment scripts.
+Spikes that test design assumptions before code depends on them. Each has a report `NNNN-title.md` and, if it has inputs or scripts, a directory of the same name. Reports are evidence for ADRs; they decide nothing on their own. An evidence-gated ADR ([ADR-0012](../adr/0012-evidence-before-acceptance.md)) may name an experiment, with its pass criterion, before the experiment runs; the ADR stays Proposed until the report is here and passes. Planned: 0004 (elaborated certificates use only ADR-0008's rules; S4a of [ADR-0006](../adr/0006-thin-end-to-end-slice.md)). Solvers and checkers are pinned in [`tools/`](../../tools/README.md): run `tools/fetch.sh` once, then pass `tools/bin/cvc5` to the experiment scripts.
 
 | # | Question | Result |
 |---|---|---|

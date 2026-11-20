@@ -1,6 +1,6 @@
 # Roadmap
 
-Phases are ordered by dependency ([ADR-0006](adr/0006-thin-end-to-end-slice.md) proposes a thin end-to-end slice through phases 1–3 first). Each has **exit criteria** that must all hold before the phase is considered done. Later phases are more speculative and will be revised by ADRs.
+Phases are ordered by dependency. Before widening phase 1, work follows a thin end-to-end slice through phases 1–3 ([ADR-0006](adr/0006-thin-end-to-end-slice.md); see [Thin slice](#thin-slice-adr-0006)). Each has **exit criteria** that must all hold before the phase is considered done. Later phases are more speculative and will be revised by ADRs.
 
 The key project metric (phase 9) should be measured informally from phase 3 onward, so design choices can be judged by their effect on the agent loop.
 
@@ -16,6 +16,24 @@ Repo layout, docs, ADR process, example sketches, test layout.
 - [x] Provisional phase-1 grammar draft in `spec/`.
 - [x] Example sketches in `examples/`, each marked provisional.
 - [x] Accepted ADRs for: implementation language ([ADR-0001](adr/0001-implementation-language.md)), arithmetic semantics ([ADR-0002](adr/0002-arithmetic-semantics.md)), kernel logic and proof format ([ADR-0003](adr/0003-kernel-logic-and-proof-format.md)).
+
+## Thin slice (ADR-0006)
+
+The narrowest path from source to a kernel-checked function, built before phase 1's exit criteria are pursued in full. It tests the riskiest assumptions early: certificates fit the kernel rules, the agent loop beats an existing verifier, and spec review tooling works. Slice code is limited to the slice subset and follows every repository rule. Steps S2b–S4a build to Proposed ADRs 0007, 0008 and 0010 as their evidence-gate experiments ([ADR-0012](adr/0012-evidence-before-acceptance.md)).
+
+| Step | Scope | Status |
+|---|---|---|
+| S1 | Elaboration spike: cvc5 certificates against kernel rules | done ([experiment 0001](experiments/0001-alethe-elaboration.md); ADR-0003 superseded by Proposed ADR-0008) |
+| S2 | Slice subset in `spec/`: `u32`, `u64`, `usize`, `bool`, fixed arrays, `&`/`&mut` slices, `while` with `invariant`, `requires`/`ensures` | next |
+| S2b | Core IR for the slice and its canonical text (`spec/core-ir.md`); front end lowers to it | — |
+| S3 | `cgen` over Core IR, phase-1 traps; C accepted by gcc, clang, CompCert (gate for ADR-0010) | — |
+| S4a | `vcgen`, elaborator prototype, stand-in checkers (Carcara, Ethos); experiment 0004 (gates for ADR-0007, ADR-0008) | — |
+| S4b | Kernel rules for the slice; replaces the stand-in checker | — |
+| S5 | Minimal oracle over JSON stdio | — |
+| S6 | Agent run: 10 tasks against a Dafny/Verus baseline (gates for ADR-0011, ADR-0013) | — |
+| S7 | Spec-review spike on existing Dafny/Verus programs; off the critical path | may start at any time |
+
+After S6 and S7, phases continue in the order below, widening from the slice.
 
 ## Phase 1 — Minimal core
 

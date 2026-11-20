@@ -1,8 +1,8 @@
 # ADR-0012: Trusted-base and behavior ADRs stay Proposed until their experiment has run
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-20
-- **Deciders:** —
+- **Deciders:** project maintainer (accepted 2026-11-20)
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** none. Amends the ADR workflow in [adr/README.md](README.md) and `CLAUDE.md`.
 - **Evidence gate:** none (process decision)

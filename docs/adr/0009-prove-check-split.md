@@ -1,8 +1,8 @@
 # ADR-0009: Separate `quodc prove` and `quodc check`; certificates are cached artifacts
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-20
-- **Deciders:** —
+- **Deciders:** project maintainer (accepted 2026-11-20)
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** none. Narrows [open-questions.md §12](../open-questions.md#12-role-of-the-smt-solver) (the solver stays agent-side; adds a `prove`/`check` split).
 - **Depends on:** [ADR-0008](0008-kernel-rules-from-real-certificates.md) (proof format), [ADR-0007](0007-trusted-obligation-generator.md) (obligation IDs and fingerprints)

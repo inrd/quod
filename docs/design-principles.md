@@ -29,7 +29,8 @@ Each principle states the rule, why it exists, and its consequences. Syntax in t
 **Why.** If a large, heuristic component is trusted, its bugs become soundness bugs. A small kernel can be audited, and in the long run verified itself.
 
 **Consequences.**
-- Proofs are **explicit artifacts** stored alongside code, written by agents, checked by the kernel.
+- Proofs are **explicit artifacts** stored alongside code: certificates keyed by obligation ID and fingerprint, reused while the fingerprint matches, and checked by the kernel ([ADR-0009](adr/0009-prove-check-split.md)).
+- **Two commands.** `quodc prove` runs the solver and elaborator (untrusted, non-deterministic) on obligations whose certificate is missing or stale and writes certificates. `quodc check` runs only `vcgen` and the kernel on stored certificates and never calls a solver. CI and release builds run `check`; a missing certificate is an error, never a timeout.
 - SMT solvers are *search helpers* for agents. Their certificates are elaborated, outside the kernel, into flat proofs using the kernel's accepted rules ([ADR-0003](adr/0003-kernel-logic-and-proof-format.md)).
 - **No timeouts.** Checking is deterministic and reproducible; a proof either checks or it doesn't, on every machine.
 - The path from checked obligations to emitted code must itself be trustworthy: either the obligation generator is in the trusted base (and kept small) or its output is validated. See [architecture.md](architecture.md#trust-boundaries).

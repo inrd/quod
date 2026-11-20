@@ -5,6 +5,7 @@
 - **Deciders:** <maintainers who accepted/rejected>
 - **Author:** <human or agent; if agent, the human who requested it>
 - **Closes:** <link to open-questions.md section, if any>
+- **Evidence gate:** <experiment and pass criterion> (pending | passed) — or: none (<front-end, process or scope decision>); see ADR-0012
 
 ## Context
 

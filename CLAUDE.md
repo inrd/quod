@@ -11,6 +11,9 @@ Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Ph
 | [0003](docs/adr/0003-kernel-logic-and-proof-format.md) | Many-sorted first-order kernel logic; flat proofs in a strict Alethe subset plus Quod rules |
 | [0004](docs/adr/0004-phase-1-typing-choices.md) | Phase-1 typing: pointer-width `usize`, `&p[lo..hi]` slicing, one-level implicit deref, same-type shifts, ordered struct literals, no dead code/recursion/modules |
 | [0005](docs/adr/0005-portable-static-checks-for-pointer-sized-integers.md) | Static checks treat `usize`/`isize` conservatively: values may need 64 bits, stored values must fit 32 bits; target-independent |
+| [0006](docs/adr/0006-thin-end-to-end-slice.md) | Build a thin end-to-end slice (S1–S7) through phases 1–3 before widening; slice code limited to the slice subset |
+| [0009](docs/adr/0009-prove-check-split.md) | `quodc prove` (solver, untrusted, non-deterministic) writes certificates; `quodc check` (kernel + `vcgen`, deterministic, used by CI) checks stored certificates only |
+| [0012](docs/adr/0012-evidence-before-acceptance.md) | Trusted-base and behavior ADRs stay Proposed until a named experiment passes; gated designs may be built as the experiment; no partial acceptance |
 
 Read the relevant ADR before working on the area it covers.
 
@@ -47,10 +50,13 @@ Read the relevant ADR before working on the area it covers.
 2. **Decisions are ADRs.** A design decision (anything that closes an item in `docs/open-questions.md`, changes a principle, or picks a technology) is recorded as an ADR:
    - Copy `docs/adr/0000-template.md` to `docs/adr/NNNN-short-title.md` with the next free number.
    - Status starts as `Proposed`. Only a human maintainer moves it to `Accepted` or `Rejected`.
+   - **Evidence gate** ([ADR-0012](docs/adr/0012-evidence-before-acceptance.md)): an ADR that changes the trusted base (kernel rules, axioms, sorts; `vcgen` encodings; `cgen` output; Core IR semantics; trust-report toolchain items) or rests on a claim about solver or agent behavior names an experiment with a pass criterion fixed in advance. It stays `Proposed` until the report in `docs/experiments/` shows a pass; on a fail it is revised or rejected. Every ADR header has an `Evidence gate:` line. No partial acceptance: split the ADR instead.
    - When accepted, update `docs/open-questions.md` (mark the question resolved and link the ADR) and any doc it affects. The `/accept-adr NNNN` skill walks through these edits.
    - ADRs are never edited after acceptance except to set `Superseded by NNNN`.
 3. **Open questions stay open until a human decides.** Agents may add options, evidence and trade-offs to `docs/open-questions.md` and may draft a `Proposed` ADR, but must not treat a question as settled.
-4. **Code follows the roadmap phase.** All implementation code is Rust ([ADR-0001](docs/adr/0001-implementation-language.md)). Only write code for the current roadmap phase (now: phase 1), and only for designs already written down in `docs/` or `spec/`.
+4. **Code follows the roadmap phase.** All implementation code is Rust ([ADR-0001](docs/adr/0001-implementation-language.md)). Only write code for the current roadmap phase (now: phase 1), and only for designs already written down in `docs/` or `spec/`. Two exceptions:
+   - **Thin slice** ([ADR-0006](docs/adr/0006-thin-end-to-end-slice.md)): code for its steps S2–S6 (Core IR, `cgen`, `vcgen`, elaborator, kernel, minimal oracle) may be written before phase 1 is complete, **limited to the slice subset**. Slice code follows every repository rule.
+   - **Building to a gated design** (ADR-0012): code that a Proposed, evidence-gated ADR's experiment needs may follow that ADR's design. It does not settle the ADR, and it is revised or removed if the ADR is rejected. No fallback alternative is built in parallel.
 
 ## Rust and kernel rules (ADR-0001)
 
