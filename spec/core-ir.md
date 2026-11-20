@@ -1,6 +1,6 @@
 # Core IR — slice subset
 
-> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). §3 is implemented in `coreir/`; lowering (§8), `vcgen` (§7) and `cgen` are not yet.
+> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). §3 is implemented in `coreir/` and §8 in `compiler/src/lower.rs` (`quodc lower`); `vcgen` (§7) and `cgen` are not yet.
 
 ## 1. Role
 
@@ -277,7 +277,7 @@ ID: `<fn>/<kind>/<n>`, where `n` counts the function's obligations of that kind 
 | local `x` | `x`, or `x.N` if an earlier local of this function had the same name (sibling scopes) |
 | any subexpression that is an operation | a fresh `(let $N T …)`, in left-to-right evaluation order ([typing.md §5](typing.md#5-expressions)) |
 | integer literal | machine literal with its checked type, in decimal |
-| `a && b` (code) | `(let $p bool a)`, `(var $r bool $p)`, `(if $p (then <b> (set $r $b)) (else))`; `\|\|` dually |
+| `a && b` (code) | `<a>`, `(var $r bool a)`, `(if a (then <b> (set $r b)) (else))`; for `\|\|` the branches swap |
 | `place = e` | index of `place` (if any), then `e`, then `set`/`store` |
 | `place op= e` | index of `place`, `load` (or the local), `e`, the operation, `set`/`store` |
 | `&p[lo..hi]`, `&mut p[lo..hi]` | `lo`, `hi`, then `(let $N … (view/mview p lo hi))` at that argument's position |
@@ -288,7 +288,7 @@ ID: `<fn>/<kind>/<n>`, where `n` counts the function's obligations of that kind 
 
 Lowering does not fold constants, reorder operations or drop operations whose result is unused.
 
-**Outside the slice.** A construct that type-checks but is outside the slice subset ([contracts.md §7](contracts.md#7-slice-subset)) is rejected by lowering with `E0401` ("not in the slice subset"), to be registered in [diagnostics.md](diagnostics.md) when lowering is implemented. In addition to the table in contracts.md §7, the slice requires that a `while` condition contains no calls (§3.4: `head` has no `call`).
+**Outside the slice.** A construct that type-checks but is outside the slice subset ([contracts.md §7](contracts.md#7-slice-subset)) is rejected by lowering with `E0401` ([diagnostics.md](diagnostics.md#lowering)). In addition to the table in contracts.md §7, the slice requires that a `while` condition contains no calls (§3.4: `head` has no `call`).
 
 **Source map.** Lowering also writes a source map from each Core IR site (function, kind, ordinal) to its source span. It is untrusted and not part of the Core IR text, so source positions never change the text or obligation IDs.
 

@@ -6,6 +6,9 @@ license.workspace = true
 publish.workspace = true
 description = "Quod compiler front end (phase 1)"
 
+[dependencies]
+coreir = { path = "../coreir" }
+
 [lib]
 path = "src/lib.rs"
 

@@ -1,0 +1,30 @@
+(quod-core 0)
+
+(fn find
+  (params (xs (ref (slice u32))) (key u32))
+  (ret usize)
+  (requires)
+  (ensures
+    (<= (int result) (int (len xs)))
+    (forall k 0 (int result) (!= (int (sel xs k)) (int key)))
+    (=> (< (int result) (int (len xs))) (= (int (sel xs (int result))) (int key))))
+  (body
+    (var i usize 0usize)
+    (loop
+      (head
+        (let $0 usize (len xs))
+        (let $1 bool (lt.usize i $0)))
+      (cond $1)
+      (invariant (<= (int i) (int (len xs))))
+      (invariant (forall k 0 (int i) (!= (int (sel xs k)) (int key))))
+      (decreases (- (int (len xs)) (int i)))
+      (body
+        (let $2 u32 (load xs i))
+        (let $3 bool (eq.u32 $2 key))
+        (if $3
+          (then
+            (return i))
+          (else))
+        (let $4 usize (add.usize i 1usize))
+        (set i $4)))
+    (return i)))

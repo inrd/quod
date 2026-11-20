@@ -11,6 +11,7 @@ commands:
                                       --write: rewrite files in place
   parse <file>                        print the AST as an S-expression
   check <file>                        type-check; print the unverified-checks report
+  lower <file>                        lower to Core IR (thin-slice subset); print its text
 ";
 
 fn main() -> ExitCode {
@@ -23,6 +24,7 @@ fn main() -> ExitCode {
         "fmt" => fmt(rest),
         "parse" => parse(rest),
         "check" => check(rest),
+        "lower" => lower(rest),
         "-h" | "--help" | "help" => {
             print!("{USAGE}");
             ExitCode::SUCCESS
@@ -135,6 +137,31 @@ fn check(args: &[String]) -> ExitCode {
         Err(d) => {
             eprintln!("{}", d.render(path, &src));
             ExitCode::from(1)
+        }
+    }
+}
+
+fn lower(args: &[String]) -> ExitCode {
+    let [path] = args else {
+        eprint!("{USAGE}");
+        return ExitCode::from(2);
+    };
+    let src = match read(path) {
+        Ok(s) => s,
+        Err(code) => return code,
+    };
+    match quodc::lower_source(&src) {
+        Ok(text) => {
+            print!("{text}");
+            ExitCode::SUCCESS
+        }
+        Err(Err(d)) => {
+            eprintln!("{}", d.render(path, &src));
+            ExitCode::from(1)
+        }
+        Err(Ok(internal)) => {
+            eprintln!("quodc: internal error: {internal}");
+            ExitCode::from(3)
         }
     }
 }

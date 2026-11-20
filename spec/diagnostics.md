@@ -9,7 +9,7 @@ Format: `E` + 4 digits. The first two digits name the stage.
 | `E01xx` | lexer |
 | `E02xx` | parser |
 | `E03xx` | name resolution and type checking ([typing.md](typing.md)) |
-| `E04xx` | lowering to Core IR ([core-ir.md](core-ir.md); not yet assigned) |
+| `E04xx` | lowering to Core IR ([core-ir.md](core-ir.md)) |
 | `E05xx` | C emission (not yet assigned) |
 
 Phase 1 stops at the first error in each file (no recovery).
@@ -68,4 +68,12 @@ Specified in [typing.md](typing.md); implemented in `compiler/src/check.rs`.
 | `E0327` | `old` in `requires`, nested `old`, or `old` reading a local that does not exist at function entry. |
 | `E0328` | `result` outside `ensures`, inside `old`, or in a function returning `()`. |
 | `E0329` | Call in a spec context (no `spec fn` yet). |
+
+## Lowering
+
+Specified in [core-ir.md §8](core-ir.md#8-lowering-front-end-untrusted); implemented in `compiler/src/lower.rs`.
+
+| Code | Meaning |
+|---|---|
+| `E0401` | Construct that type-checks but is outside the thin-slice subset ([contracts.md §7](contracts.md#7-slice-subset)). |
 

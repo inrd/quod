@@ -1,0 +1,45 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+fn fill(dst: &mut [u32], v: u32) -> ()
+    effects {}
+    ensures forall k: int in 0..dst.len { dst[k] == v }
+{
+    let mut i: usize = 0;
+    while i < dst.len && i < 100
+        invariant i <= dst.len
+        invariant forall k: int in 0..i { dst[k] == v }
+        decreases dst.len - i
+    {
+        dst[i] = v;
+        i += 1;
+    }
+}
+
+fn sum3(xs: &[u64]) -> u64
+    effects {}
+    requires xs.len >= 3
+    ensures result == xs[0] + xs[1] + xs[2]
+{
+    return xs[0] + (xs[1] + xs[2]);
+}
+
+pub fn main_like(n: usize) -> u64
+    effects {}
+    requires n <= 4
+{
+    let mut a: [u32; 4] = [1, 2, 3, 4];
+    let b: [u32; 4] = a;
+    fill(&mut a[0..n], 7);
+    a[1] *= 2;
+    if n == 0 || a[0] == 7 {
+        let x: u32 = b[3];
+        a[2] = x;
+    } else if n == 1 {
+        let x: u32 = 5;
+        a[2] = x;
+    } else {
+        return 0;
+    }
+    let w: [u64; 3] = [1, 2, 3];
+    return sum3(&w[0..3]);
+}

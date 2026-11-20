@@ -43,7 +43,7 @@ compiler/      quodc: parser, formatter, type checker (phase 1, in progress)
 coreir/        Core IR text and checks for the thin slice
 kernel/        trusted proof checker                  (empty: phase 2)
 oracle/        JSON query server for agents           (empty: phase 3)
-tests/         test corpus (parse/, typecheck/, coreir/ populated)
+tests/         test corpus (parse/, typecheck/, lower/, coreir/ populated)
 tools/         pinned external tools for experiments (cvc5, Ethos, Carcara)
 xtask/         repository checks (cargo xtask lint)
 ```

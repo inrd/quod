@@ -1,0 +1,5 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0401
+fn g() -> bool effects {} { return false; }
+
+fn f() -> () effects {} { while g() decreases 0 {} }

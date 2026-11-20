@@ -1,6 +1,6 @@
 # CLAUDE.md — working in the Quod repository
 
-Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser, canonical formatter and type checker (with the unverified-checks report), including contracts and `while` loops for the thin slice; the C emitter is not written yet.
+Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser, canonical formatter and type checker (with the unverified-checks report), including contracts and `while` loops for the thin slice, and lowers the slice subset to Core IR (`quodc lower`); the C emitter is not written yet.
 
 ## Accepted decisions
 
@@ -33,16 +33,16 @@ Read the relevant ADR before working on the area it covers.
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
 | `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
-| `spec/core-ir.md` | Core IR for the slice: canonical text, operations, obligation generation, lowering (draft; text and checks implemented in `coreir/`) |
+| `spec/core-ir.md` | Core IR for the slice: canonical text, operations, obligation generation, lowering (draft; text and checks in `coreir/`, lowering in `compiler/`) |
 | `spec/contracts.md` | Contracts, `while` loops, spec contexts and the thin-slice subset (draft; implemented in the front end, not yet lowered or verified) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
 | `Cargo.toml` | Workspace root; members: `compiler`, `coreir`, `xtask` |
 | `examples/*.qd` | Provisional syntax sketches |
-| `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, CLI |
+| `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, lowering to Core IR, CLI |
 | `coreir/` | Core IR types, canonical text parser/printer, well-formedness checks ([spec/core-ir.md](spec/core-ir.md)); trusted if ADR-0007 is accepted; kernel-style constraints, ≤ 1,500 lines |
 | `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
-| `tests/` | Test corpus; `parse/` and `typecheck/` are run by `compiler/tests/`, `coreir/` (`.core` files) by `coreir/tests/` |
+| `tests/` | Test corpus; `parse/`, `typecheck/` and `lower/` (`.qd` with golden `.core`) are run by `compiler/tests/`, `coreir/` (`.core` files) by `coreir/tests/` |
 | `tools/` | Pinned external tools for experiments (cvc5, Ethos, CPC signature, Carcara): `tools/fetch.sh` installs them into git-ignored `tools/bin/`; `tools/check-cpc.sh` checks one obligation's CPC proof |
 | `xtask/` | Repository checks (`cargo xtask lint`): links and anchors, ADR index and trusted-base statements, diagnostics registry, `.qd` headers, trusted-crate budgets, no `HashMap`/`HashSet` in `compiler/`. Tooling, not part of the compiler |
 | `.claude/` | Agent setup: permission allowlist, Stop hook (`hooks/check.sh`: fmt check + `cargo xtask lint` when the tree changed), `/accept-adr` skill |

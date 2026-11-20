@@ -1,0 +1,86 @@
+(quod-core 0)
+
+(fn fill
+  (params (dst (mut (slice u32))) (v u32))
+  (ret unit)
+  (requires)
+  (ensures
+    (forall k 0 (int (len dst)) (= (int (sel dst k)) (int v))))
+  (body
+    (var i usize 0usize)
+    (loop
+      (head
+        (let $0 usize (len dst))
+        (let $1 bool (lt.usize i $0))
+        (var $2 bool $1)
+        (if $1
+          (then
+            (let $3 bool (lt.usize i 100usize))
+            (set $2 $3))
+          (else)))
+      (cond $2)
+      (invariant (<= (int i) (int (len dst))))
+      (invariant (forall k 0 (int i) (= (int (sel dst k)) (int v))))
+      (decreases (- (int (len dst)) (int i)))
+      (body
+        (store dst i v)
+        (let $4 usize (add.usize i 1usize))
+        (set i $4)))
+    (return)))
+
+(fn sum3
+  (params (xs (ref (slice u64))))
+  (ret u64)
+  (requires
+    (>= (int (len xs)) 3))
+  (ensures
+    (= (int result) (+ (+ (int (sel xs 0)) (int (sel xs 1))) (int (sel xs 2)))))
+  (body
+    (let $0 u64 (load xs 0usize))
+    (let $1 u64 (load xs 1usize))
+    (let $2 u64 (load xs 2usize))
+    (let $3 u64 (add.u64 $1 $2))
+    (let $4 u64 (add.u64 $0 $3))
+    (return $4)))
+
+(fn main_like
+  (params (n usize))
+  (ret u64)
+  (requires
+    (<= (int n) 4))
+  (ensures)
+  (body
+    (let $0 (array u32 4) (array u32 1u32 2u32 3u32 4u32))
+    (var a (array u32 4) $0)
+    (let b (array u32 4) a)
+    (let $1 (mut (slice u32)) (mview a 0usize n))
+    (call fill $1 7u32)
+    (let $2 u32 (load a 1usize))
+    (let $3 u32 (mul.u32 $2 2u32))
+    (store a 1usize $3)
+    (let $4 bool (eq.usize n 0usize))
+    (var $5 bool $4)
+    (if $4
+      (then)
+      (else
+        (let $6 u32 (load a 0usize))
+        (let $7 bool (eq.u32 $6 7u32))
+        (set $5 $7)))
+    (if $5
+      (then
+        (let $8 u32 (load b 3usize))
+        (let x u32 $8)
+        (store a 2usize x))
+      (else
+        (let $9 bool (eq.usize n 1usize))
+        (if $9
+          (then
+            (let x.1 u32 5u32)
+            (store a 2usize x.1))
+          (else
+            (return 0u64)))))
+    (let $10 (array u64 3) (array u64 1u64 2u64 3u64))
+    (let w (array u64 3) $10)
+    (let $11 (ref (slice u64)) (view w 0usize 3usize))
+    (let $12 u64 (call sum3 $11))
+    (return $12)))

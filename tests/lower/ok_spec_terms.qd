@@ -1,0 +1,28 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+fn bits(x: u32, dst: &mut [u32]) -> u32
+    effects {}
+    requires dst.len > 0 && (x & 1) == 0
+    ensures (result >> 1) <= result
+    ensures exists k: int in -1..dst.len { k == -1 || dst[k] == old(dst[k]) + 0 }
+    ensures !(result == x) ==> -(x + 1) < 0
+{
+    dst[0] = !x;
+    dst[0] = x;
+    return x | 2;
+}
+
+fn noop(flag: bool) -> ()
+    effects {}
+    ensures flag == flag
+{
+    if !flag {
+        return ();
+    }
+    return noop2();
+}
+
+fn noop2() -> ()
+    effects {}
+{
+}

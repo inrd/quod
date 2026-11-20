@@ -1,0 +1,5 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0401
+fn g(a: &[u32; 2]) -> () effects {} {}
+
+fn f() -> () effects {} { let a: [u32; 2] = [1, 2]; g(&a); }

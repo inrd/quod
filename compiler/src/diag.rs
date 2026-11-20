@@ -101,6 +101,8 @@ pub enum Code {
     E0328,
     /// Call in a spec context.
     E0329,
+    /// Construct outside the thin-slice subset (lowering to Core IR).
+    E0401,
 }
 
 impl Code {
@@ -144,6 +146,7 @@ impl Code {
             Code::E0327 => "E0327",
             Code::E0328 => "E0328",
             Code::E0329 => "E0329",
+            Code::E0401 => "E0401",
         }
     }
 }

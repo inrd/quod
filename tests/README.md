@@ -6,6 +6,8 @@ Each directory will hold `.qd` inputs with expected outputs (golden files) or ex
 |---|---|---|
 | `parse/` | grammar acceptance/rejection, formatter idempotence (`format(format(x)) == format(x)`) | 1 |
 | `typecheck/` | positive and negative cases; every implicit conversion/overload attempt must be rejected | 1 |
+| `lower/` | slice programs and their golden Core IR (`.core`); `E0401` cases | slice |
+| `coreir/` | canonical Core IR texts accepted by `coreir` | slice |
 | `emit/` | C output compiles with `-Wall -Wextra -Werror`, runs clean under UBSan/ASan | 1 |
 | `obligations/` | expected obligation lists and stable IDs per input; ID stability under unrelated edits | 2–3 |
 | `kernel-soundness/` | known-false obligations with bogus proofs: all must be rejected | 2 |

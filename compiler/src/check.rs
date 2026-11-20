@@ -61,6 +61,9 @@ pub struct Trap {
 pub struct Checked {
     /// Trap sites in source order.
     pub traps: Vec<Trap>,
+    /// Type of every checked expression, keyed by its span (start, end).
+    /// Used by lowering (`spec/core-ir.md` §8).
+    pub types: BTreeMap<(usize, usize), Ty>,
 }
 
 /// Render the unverified-checks report.
@@ -105,7 +108,10 @@ pub fn check(file: &File) -> CResult<Checked> {
     c.recursion()?;
     let mut traps = c.traps;
     traps.sort_by_key(|t| (t.span.start, t.kind));
-    Ok(Checked { traps })
+    Ok(Checked {
+        traps,
+        types: c.types,
+    })
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -163,6 +169,7 @@ struct Checker {
     loop_depth: usize,
     /// Set while checking a contract clause.
     spec: Option<SpecCtx>,
+    types: BTreeMap<(usize, usize), Ty>,
 }
 
 impl Checker {
@@ -805,6 +812,12 @@ impl Checker {
     }
 
     fn infer(&mut self, e: &Expr, exp: Option<&Ty>) -> CResult<Ty> {
+        let t = self.infer_kind(e, exp)?;
+        self.types.insert((e.span.start, e.span.end), t.clone());
+        Ok(t)
+    }
+
+    fn infer_kind(&mut self, e: &Expr, exp: Option<&Ty>) -> CResult<Ty> {
         match &e.kind {
             ExprKind::Int(l) => {
                 let t = self.int_literal_ty(l, e.span, exp)?;
@@ -1383,6 +1396,12 @@ impl Checker {
     }
 
     fn spec_expr(&mut self, e: &Expr, exp: Option<&Ty>) -> CResult<Ty> {
+        let t = self.spec_kind(e, exp)?;
+        self.types.insert((e.span.start, e.span.end), t.clone());
+        Ok(t)
+    }
+
+    fn spec_kind(&mut self, e: &Expr, exp: Option<&Ty>) -> CResult<Ty> {
         match &e.kind {
             ExprKind::Int(l) => match (l.suffix, exp) {
                 (None, Some(Ty::Int(_))) | (Some(_), _) => self.infer(e, exp),
