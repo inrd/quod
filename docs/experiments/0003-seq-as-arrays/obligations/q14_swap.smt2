@@ -1,0 +1,10 @@
+(set-logic ALL)
+; q14 (new): swap a[i], a[j]; swapped positions and frame
+(declare-const a (Array Int Int))(declare-const a_len Int)(declare-const i Int)(declare-const j Int)(declare-const k Int)
+(declare-const b (Array Int Int))
+(assert (<= 0 a_len))
+(assert (and (<= 0 i) (< i a_len) (<= 0 j) (< j a_len) (<= 0 k) (< k a_len)))
+(assert (= b (store (store a i (select a j)) j (select a i))))
+(assert (not (and (= (select b i) (select a j)) (= (select b j) (select a i))
+                  (=> (and (distinct k i) (distinct k j)) (= (select b k) (select a k))))))
+(check-sat)

@@ -1,0 +1,10 @@
+(set-logic ALL)
+; s04 (new): q01 through a slice view s = &mut a[lo..hi]
+(declare-const a (Array Int Int))(declare-const a_len Int)
+(declare-const lo Int)(declare-const hi Int)(declare-const i Int)
+(assert (<= 0 a_len))
+(assert (and (<= 0 lo) (<= lo hi) (<= hi a_len)))
+(assert (and (<= 0 i) (< i (- hi lo))))
+(assert (forall ((k Int)) (=> (and (<= 0 k) (< k i)) (= (select a (+ lo k)) 0))))
+(assert (not (forall ((k Int)) (=> (and (<= 0 k) (< k (+ i 1))) (= (select (store a (+ lo i) 0) (+ lo k)) 0)))))
+(check-sat)

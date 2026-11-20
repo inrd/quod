@@ -1,0 +1,7 @@
+(set-logic ALL)
+; q07: linear search, found => exists a witness (existential goal)
+(declare-const a (Array Int Int))(declare-const a_len Int)(declare-const i Int)(declare-const x Int)
+(assert (<= 0 a_len))
+(assert (and (<= 0 i) (< i a_len) (= (select a i) x)))
+(assert (not (exists ((k Int)) (and (<= 0 k) (< k a_len) (= (select a k) x)))))
+(check-sat)

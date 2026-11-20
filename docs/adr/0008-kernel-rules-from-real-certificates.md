@@ -5,7 +5,7 @@
 - **Deciders:** —
 - **Author:** Claude (agent), at the maintainer's request
 - **Supersedes:** [ADR-0003](0003-kernel-logic-and-proof-format.md) (on acceptance, ADR-0003's status becomes `Superseded by ADR-0008`)
-- **Closes:** none new; keeps [open-questions.md §2](../open-questions.md#2-kernel-logic-and-proof-term-format) resolved; opens two sub-questions (bit-vectors, sequences)
+- **Closes:** none new; keeps [open-questions.md §2](../open-questions.md#2-kernel-logic-and-proof-term-format) resolved; opens one sub-question (bit-vectors); sequences are settled in §5 by experiment 0003
 - **Depends on:** ADR-0001, ADR-0002, [experiment 0001](../experiments/0001-alethe-elaboration.md)
 
 ## Context
@@ -82,23 +82,25 @@ Bit-vector reasoning is not decided by this ADR. Until an experiment settles it:
 
 ### 5. Sequences: encode as arrays
 
-- The kernel sort `Seq(S)` keeps ADR-0003's meaning (length + indexing). Its axioms are **array-style**: read-over-write (same and different index), length preserved by update, and length/index of a sub-range view.
-- The obligation generator sends sequence obligations to solvers **as SMT arrays plus an explicit length**, not as SMT-LIB `Seq`. Phases 1–2 only need length, indexing, update and sub-range slicing, which this encoding expresses without string theory.
-- Experiment 0003 repeats experiment 0001's `q` obligations in this encoding before the kernel implements `Seq` rules.
+- Sequence contents use the kernel sort `Array(Int, S)`. Its only axioms are read-over-write at the same index and at a different index. There is no extensionality axiom.
+- `Seq(S)` keeps ADR-0003's meaning (length + indexing), but it is an **encoding in the obligation generator** ([ADR-0007](0007-trusted-obligation-generator.md)), not a kernel sort. A sequence is an array term plus an `Int` length term (`0 <= len`); update is `store`, and the length term stays the same; a sub-range view is the base array plus an offset, and views of views add offsets. Sequence equality is equal lengths plus pointwise equality on `[0, len)`, never array `=`, because array `=` would also constrain out-of-range indices.
+- Solvers receive the same encoding, so no string theory is involved. Phases 1–2 only need length, indexing, update and sub-range slicing.
+- Generator guidance (not a kernel rule): quantifiers over a view range over base indices, so E-matching triggers contain no arithmetic.
+- Evidence: [experiment 0003](../experiments/0003-seq-as-arrays.md). All 17 obligations got Alethe certificates with no rejected rule (2 needed `--enum-inst`), and only the two read-over-write axioms were used.
 
 ## Consequences
 
-- **Trusted base grows:** kernel code for `qd_poly_norm`'s size bound, `qd_evaluate`, `qd_rewrite` instantiation, the four `la_mult_*` checks, and the premise-form equality rules; axiom-file entries for unprovable rewrite schemas and `div`/`mod` definitions (the latter were needed under ADR-0003 too). Provable rewrite schemas add no trust. The kernel's 5,000-line budget (ADR-0001) still applies; if this does not fit, that is a reason to revisit before raising the budget.
+- **Trusted base grows:** kernel code for `qd_poly_norm`'s size bound, `qd_evaluate`, `qd_rewrite` instantiation, the four `la_mult_*` checks, and the premise-form equality rules; axiom-file entries for unprovable rewrite schemas, `div`/`mod` definitions (the latter were needed under ADR-0003 too) and the two array read-over-write axioms (replacing ADR-0003's sequence axioms). The trusted obligation generator (ADR-0007) gains the sequence encoding of §5. Provable rewrite schemas add no trust. The kernel's 5,000-line budget (ADR-0001) still applies; if this does not fit, that is a reason to revisit before raising the budget.
 - **Proof size** stays close to solver output (median ~230 Alethe steps in experiment 0001) instead of growing with re-proven rewrites.
 - **Agent loop:** kernel errors still name one step. A failing `qd_rewrite` names the schema, which an agent can look up in `kernel/rewrites`.
 - **Elaborator** is larger (two input formats) but stays untrusted.
-- **Slice (ADR-0006):** S4 can start on linear arithmetic, Booleans, quantifiers and arrays-as-sequences once experiment 0003 passes; bit-vector support waits for experiment 0002.
-- Docs to update on acceptance: ADR-0003 status, `docs/adr/README.md`, `kernel/README.md` (rules, rewrites file, size bound), `architecture.md` (component table: elaborator inputs), `oracle-protocol.md` (`proof/submit` still takes Alethe text; certificates may come from either format), `open-questions.md` §2 and §12, new open-question entries for §4 and §5 if not settled first.
+- **Slice (ADR-0006):** S4 can start on linear arithmetic, Booleans, quantifiers and arrays-as-sequences (experiment 0003 passed); bit-vector support waits for experiment 0002.
+- Docs to update on acceptance: ADR-0003 status, `docs/adr/README.md`, `kernel/README.md` (rules, rewrites file, size bound), `architecture.md` (component table: elaborator inputs), `oracle-protocol.md` (`proof/submit` still takes Alethe text; certificates may come from either format), `open-questions.md` §2 and §12, a new open-question entry for §4 if not settled first.
 
 ## Validation
 
 - Re-run experiment 0001's corpus through the elaborator and kernel once built: **≥ 80% of solved non-bit-vector obligations** check without manual steps.
 - Every schema in `kernel/rewrites` is either kernel-proven at load or listed in the axiom file; CI fails otherwise.
 - Kernel within budget with all rules above.
-- Experiments 0002 (bit-vectors) and 0003 (sequences as arrays) completed, each followed by an ADR or an update to this one before acceptance.
+- Experiments 0002 (bit-vectors) and 0003 (sequences as arrays) completed, each followed by an ADR or an update to this one before acceptance. Experiment 0003: done, §5 updated. Experiment 0002: pending.
 - Revisit if cvc5 changes RARE or CPC so that the schema list churns between releases, or if `qd_poly_norm`'s size bound rejects common obligations.
