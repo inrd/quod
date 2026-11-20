@@ -13,7 +13,7 @@ Not checked in phase 1. Each of these parses but is rejected with `E0318`, so th
 | Generic parameters on `fn`/`type`, generic arguments, `id::<T>` | [open-questions §7](../docs/open-questions.md#7-generics-and-compile-time-evaluation) undecided | by ADR |
 | `mod`, `use` | multi-file compilation not designed | by ADR |
 | Non-empty `effects { … }` | effect system | phase 4 |
-| `int` outside a quantifier binder, `nat` | spec-only types; the slice needs `int` only as a binder ([contracts.md §5.1](contracts.md#51-types-and-literals)) | phase 2 |
+| `nat` | spec-only type; not needed by the slice (`int` outside a quantifier binder is `E0326`, [contracts.md §5.1](contracts.md#51-types-and-literals)) | phase 2 |
 | Named array lengths `[T; N]` | needs const generics or const items | by ADR |
 | Recursion (direct or mutual) | needs `decreases` | phase 2 |
 
@@ -216,7 +216,7 @@ In [grammar-draft.md](grammar-draft.md) (provisional) and implemented in the par
 |---|---|---|
 | G1 | `unary = ( "-" \| "!" ) unary \| "&" [ "mut" ] unary \| cast_expr ;` (`&&` in unary position is a syntax error) | Creating reference arguments (§8.1) |
 | G2 | `postfix` index: `"[" expr ( "]" \| ".." expr "]" )` | Array → slice (ADR-0004, Q2) |
-| G3 | `requires`/`ensures` on `fn`, `while_stmt`, `==>`, `result`, `old(e)`, quantifiers | Contracts for the slice ([contracts.md §8](contracts.md#8-grammar-and-diagnostics-changes)); not yet in the parser |
+| G3 | `requires`/`ensures` on `fn`, `while_stmt`, `==>`, `result`, `old(e)`, quantifiers | Contracts for the slice ([contracts.md §8](contracts.md#8-grammar-and-diagnostics-changes)); implemented |
 
 ## 14. Decided points (ADR-0004)
 

@@ -83,6 +83,15 @@ pub enum Kw {
     Use,
     Break,
     Continue,
+    // Contracts and spec contexts (`spec/contracts.md`).
+    Requires,
+    Ensures,
+    Invariant,
+    Decreases,
+    Old,
+    Result,
+    Forall,
+    Exists,
 }
 
 impl Kw {
@@ -108,6 +117,14 @@ impl Kw {
             Kw::Use => "use",
             Kw::Break => "break",
             Kw::Continue => "continue",
+            Kw::Requires => "requires",
+            Kw::Ensures => "ensures",
+            Kw::Invariant => "invariant",
+            Kw::Decreases => "decreases",
+            Kw::Old => "old",
+            Kw::Result => "result",
+            Kw::Forall => "forall",
+            Kw::Exists => "exists",
         }
     }
 
@@ -133,6 +150,14 @@ impl Kw {
             "use" => Kw::Use,
             "break" => Kw::Break,
             "continue" => Kw::Continue,
+            "requires" => Kw::Requires,
+            "ensures" => Kw::Ensures,
+            "invariant" => Kw::Invariant,
+            "decreases" => Kw::Decreases,
+            "old" => Kw::Old,
+            "result" => Kw::Result,
+            "forall" => Kw::Forall,
+            "exists" => Kw::Exists,
             _ => return None,
         })
     }
@@ -140,13 +165,7 @@ impl Kw {
 
 /// Keywords reserved for phase 2+ (`spec/grammar-draft.md` §1).
 pub const RESERVED: &[&str] = &[
-    "requires",
-    "ensures",
-    "invariant",
-    "decreases",
     "assert",
-    "old",
-    "result",
     "where",
     "spec",
     "impl",
@@ -156,8 +175,6 @@ pub const RESERVED: &[&str] = &[
     "ghost",
     "proof",
     "lemma",
-    "forall",
-    "exists",
     "cost",
     "stack",
     "noalloc",
@@ -183,6 +200,7 @@ pub enum Punct {
     Arrow,
     Eq,
     EqEq,
+    Implies,
     Ne,
     Lt,
     Le,
@@ -225,6 +243,7 @@ impl Punct {
             Punct::Arrow => "->",
             Punct::Eq => "=",
             Punct::EqEq => "==",
+            Punct::Implies => "==>",
             Punct::Ne => "!=",
             Punct::Lt => "<",
             Punct::Le => "<=",
@@ -252,6 +271,7 @@ impl Punct {
 
 /// Punctuation, longest first so maximal munch works by linear scan.
 const PUNCTS: &[Punct] = &[
+    Punct::Implies,
     Punct::ColonColon,
     Punct::DotLBrace,
     Punct::DotDot,
@@ -568,6 +588,21 @@ mod tests {
                 }),
                 TokKind::Punct(Punct::DotDot),
                 TokKind::Ident("n".into()),
+                TokKind::Eof
+            ]
+        );
+    }
+
+    #[test]
+    fn implies_longest_match() {
+        assert_eq!(
+            kinds("a ==> b == c"),
+            vec![
+                TokKind::Ident("a".into()),
+                TokKind::Punct(Punct::Implies),
+                TokKind::Ident("b".into()),
+                TokKind::Punct(Punct::EqEq),
+                TokKind::Ident("c".into()),
                 TokKind::Eof
             ]
         );

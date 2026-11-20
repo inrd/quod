@@ -94,6 +94,8 @@ fn item_text(item: &Item) -> String {
                 s.push_str(" }");
             }
             s.push('\n');
+            clauses(&mut s, "requires", &f.requires, 1);
+            clauses(&mut s, "ensures", &f.ensures, 1);
             s.push_str(&block(&f.body, 0));
         }
         ItemKind::Type(t) => {
@@ -122,6 +124,17 @@ fn item_text(item: &Item) -> String {
         }
     }
     s
+}
+
+/// One `keyword expr` line per clause, at `level`.
+fn clauses(out: &mut String, keyword: &str, es: &[Expr], level: usize) {
+    for e in es {
+        indent(out, level);
+        out.push_str(keyword);
+        out.push(' ');
+        out.push_str(&expr(e));
+        out.push('\n');
+    }
 }
 
 fn join(parts: impl IntoIterator<Item = String>) -> String {
@@ -226,6 +239,24 @@ fn stmt(st: &Stmt, level: usize) -> String {
             expr(end),
             block(body, level)
         ),
+        StmtKind::While {
+            cond,
+            invariants,
+            decreases,
+            body,
+        } => {
+            let mut s = format!("while {}\n", expr(cond));
+            clauses(&mut s, "invariant", invariants, level + 1);
+            clauses(
+                &mut s,
+                "decreases",
+                std::slice::from_ref(decreases),
+                level + 1,
+            );
+            indent(&mut s, level);
+            s.push_str(&block(body, level));
+            s
+        }
         StmtKind::Return(e) => format!("return {};", expr(e)),
         StmtKind::Break => "break;".to_string(),
         StmtKind::Continue => "continue;".to_string(),
@@ -297,5 +328,16 @@ pub fn expr(e: &Expr) -> String {
         ExprKind::Cast(b, t) => format!("{} as {}", expr(b), t.name),
         ExprKind::Unary(op, b) => format!("{}{}", op.as_str(), expr(b)),
         ExprKind::Binary(op, l, r) => format!("{} {} {}", expr(l), op.as_str(), expr(r)),
+        ExprKind::Result => "result".to_string(),
+        ExprKind::Old(inner) => format!("old({})", expr(inner)),
+        ExprKind::Quant(q) => format!(
+            "{} {}: {} in {}..{} {{ {} }}",
+            q.keyword(),
+            q.var.name,
+            ty(&q.ty),
+            expr(&q.lo),
+            expr(&q.hi),
+            expr(&q.body)
+        ),
     }
 }

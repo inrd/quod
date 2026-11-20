@@ -1,6 +1,6 @@
 # Contracts, loops and spec contexts — slice subset
 
-> **Status: draft, provisional, non-normative.** Step S2 of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Syntax follows [grammar-draft.md](grammar-draft.md); typing extends [typing.md](typing.md). Arithmetic in spec contexts is from [ADR-0002](../docs/adr/0002-arithmetic-semantics.md) (accepted). Everything else is a proposal. Not yet implemented in `quodc`.
+> **Status: draft, provisional, non-normative.** Step S2 of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Syntax follows [grammar-draft.md](grammar-draft.md); typing extends [typing.md](typing.md). Arithmetic in spec contexts is from [ADR-0002](../docs/adr/0002-arithmetic-semantics.md) (accepted). Everything else is a proposal. Implemented in `quodc` (parser, formatter, type checker); lowering and verification follow in later slice steps.
 
 ## 1. Scope
 
@@ -125,7 +125,7 @@ Comparison across machine widths is a deliberate extension of ADR-0002's rule (`
 | `e.len` | as in code | `usize` |
 | `?h` | as in code: records the expected type, then `E0321` | — |
 
-Not available in spec contexts: calls (`E0329`; there is no `spec fn` yet), `&`/`&mut` (`E0319`, since they only appear as call arguments), array literals, `e[lo..hi]`.
+Not available in spec contexts: calls (`E0329`; there is no `spec fn` yet), `&`/`&mut` (`E0319`, since they only appear as call arguments), `e[lo..hi]` (`E0325`), casts, array and struct literals (`E0318`). A literal index that is negative, or not below a fixed array's length, is `E0305`, as in code.
 
 **Well-formedness.** A spec expression must be defined where it is evaluated: every index is in bounds, every divisor is non-zero, and `<<`/`>>` amounts are below `bits(T)`. These are spec well-formedness obligations (ADR-0002), not traps. They are checked under the guards of the expression: in `a && b` and `a ==> b`, `b` may assume `a`; in `a || b`, `b` may assume `!a`; a quantifier body may assume its range. So `i < xs.len && xs[i] == 0` is well formed.
 
@@ -145,7 +145,7 @@ This is why `find` and `fill` (§2) state `i <= xs.len` before the quantified in
 | Expression | Allowed in | Rule |
 |---|---|---|
 | `result` | `ensures` of a function whose return type is not `()` (`E0328`) | the returned value; type is the return type |
-| `old(e)` | `ensures`, `invariant`, `decreases`; not in `requires`, not nested (`E0327`) | `e` evaluated in the function's entry state; type of `e` |
+| `old(e)` | `ensures`, `invariant`, `decreases`; not in `requires`, not nested; `e` reads only parameters and quantifier binders (`E0327`) | `e` evaluated in the function's entry state; type of `e` |
 
 Parameters are immutable and arrays are values, so `old(e)` differs from `e` only when `e` reads through a `&mut` parameter (`old(dst[k])`). `old(dst.len)` always equals `dst.len`.
 
@@ -185,13 +185,13 @@ Width-dependent operations that [ADR-0007](../docs/adr/0007-trusted-obligation-g
 
 ## 8. Grammar and diagnostics changes
 
-Grammar changes are in [grammar-draft.md](grammar-draft.md) (§2, §4, §5). New diagnostic codes, planned until implemented ([diagnostics.md](diagnostics.md#planned)):
+Grammar changes are in [grammar-draft.md](grammar-draft.md) (§2, §4, §5). New diagnostic codes ([diagnostics.md](diagnostics.md#type-checker)):
 
 | Code | Meaning |
 |---|---|
 | `E0326` | Spec-only construct in code (`old`, `result`, `forall`, `exists`, `==>`, type `int`). |
-| `E0327` | `old` in `requires`, or nested `old`. |
-| `E0328` | `result` outside `ensures`, or in a function returning `()`. |
+| `E0327` | `old` in `requires`, nested `old`, or `old` reading a local that does not exist at function entry. |
+| `E0328` | `result` outside `ensures`, inside `old`, or in a function returning `()`. |
 | `E0329` | Call in a spec context. |
 
-`E0318` also covers a quantifier binder of a type other than `int`. `while` stops being `E0206`, and `requires`, `ensures`, `invariant`, `decreases`, `old`, `result`, `forall`, `exists` stop being `E0202`.
+`E0318` also covers a quantifier binder of a type other than `int`. `while` is no longer `E0206` (that code is retired), and `requires`, `ensures`, `invariant`, `decreases`, `old`, `result`, `forall`, `exists` are no longer `E0202`.

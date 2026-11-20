@@ -1,6 +1,6 @@
 # CLAUDE.md — working in the Quod repository
 
-Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser, canonical formatter and type checker (with the unverified-checks report); the C emitter is not written yet.
+Quod is an experimental, formally verified systems language (`quodc`, `.qd`). Phase 0 (design scaffold) is complete; **phase 1 (minimal core) is in progress**: `quodc` has a lexer, LL(1) parser, canonical formatter and type checker (with the unverified-checks report), including contracts and `while` loops for the thin slice; the C emitter is not written yet.
 
 ## Accepted decisions
 
@@ -33,7 +33,7 @@ Read the relevant ADR before working on the area it covers.
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
 | `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
-| `spec/contracts.md` | Contracts, `while` loops, spec contexts and the thin-slice subset (draft, not yet implemented) |
+| `spec/contracts.md` | Contracts, `while` loops, spec contexts and the thin-slice subset (draft; implemented in the front end, not yet lowered or verified) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
 | `Cargo.toml` | Workspace root; members: `compiler`, `xtask` |

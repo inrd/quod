@@ -1,0 +1,57 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+// traps: ensures ensures ensures invariant invariant decreases bounds overflow requires ensures ensures invariant invariant decreases bounds overflow ensures invariant decreases overflow
+pub fn find(xs: &[u32], key: u32) -> usize
+    effects {}
+    ensures result <= xs.len
+    ensures forall k: int in 0..result { xs[k] != key }
+    ensures result < xs.len ==> xs[result] == key
+{
+    let mut i: usize = 0;
+    while i < xs.len
+        invariant i <= xs.len
+        invariant forall k: int in 0..i { xs[k] != key }
+        decreases xs.len - i
+    {
+        if xs[i] == key {
+            return i;
+        }
+        i = i + 1;
+    }
+    return i;
+}
+
+fn fill(dst: &mut [u32], v: u32) -> ()
+    effects {}
+    requires dst.len > 0
+    ensures dst.len == old(dst.len)
+    ensures forall k: int in 0..dst.len { dst[k] == v && old(dst[k]) + 1 > 0 }
+{
+    let mut i: usize = 0;
+    while i < dst.len
+        invariant i <= dst.len
+        invariant forall k: int in 0..i { old(dst[k]) >= 0 && (dst[k] & 0xff) == (v & 0xff) }
+        decreases dst.len - i
+    {
+        dst[i] = v;
+        i = i + 1;
+        if i == 3usize {
+            break;
+        }
+    }
+}
+
+fn mixed(a: u32, n: u64) -> u32
+    effects {}
+    ensures exists k: int in -1..(a + n) { k * 2 == result - (a / 2) }
+{
+    let mut x: u32 = a;
+    while x > 0
+        invariant x <= a && (x >> 1) <= x
+        decreases x
+    {
+        x = x / 2;
+        x += 0;
+    }
+    return x;
+}

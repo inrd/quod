@@ -54,6 +54,8 @@ fn item_sx(item: &Item) -> String {
                 ),
                 list("ret", [ty(&f.ret)]),
                 list("effects", f.effects.iter().map(|e| e.name.clone())),
+                list("requires", f.requires.iter().map(expr)),
+                list("ensures", f.ensures.iter().map(expr)),
                 block(&f.body),
             ],
         ),
@@ -141,6 +143,20 @@ fn stmt(s: &Stmt) -> String {
             "for",
             [var.name.clone(), ty(t), expr(start), expr(end), block(body)],
         ),
+        StmtKind::While {
+            cond,
+            invariants,
+            decreases,
+            body,
+        } => list(
+            "while",
+            [
+                expr(cond),
+                list("invariants", invariants.iter().map(expr)),
+                list("decreases", [expr(decreases)]),
+                block(body),
+            ],
+        ),
         StmtKind::Return(e) => list("return", [expr(e)]),
         StmtKind::Break => "(break)".to_string(),
         StmtKind::Continue => "(continue)".to_string(),
@@ -196,5 +212,17 @@ fn expr(e: &Expr) -> String {
         ExprKind::Cast(b, t) => list("as", [expr(b), t.name.clone()]),
         ExprKind::Unary(op, b) => list(op.as_str(), [expr(b)]),
         ExprKind::Binary(op, l, r) => list(op.as_str(), [expr(l), expr(r)]),
+        ExprKind::Result => "(result)".to_string(),
+        ExprKind::Old(inner) => list("old", [expr(inner)]),
+        ExprKind::Quant(q) => list(
+            q.keyword(),
+            [
+                q.var.name.clone(),
+                ty(&q.ty),
+                expr(&q.lo),
+                expr(&q.hi),
+                expr(&q.body),
+            ],
+        ),
     }
 }

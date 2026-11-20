@@ -1,0 +1,3 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0201
+fn f() -> () effects {} requires forall k: int in 0..n a {}

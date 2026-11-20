@@ -26,11 +26,11 @@ Phase 1 stops at the first error in each file (no recovery).
 | Code | Meaning |
 |---|---|
 | `E0201` | Unexpected token: the parser expected something else. |
-| `E0202` | Reserved keyword (phase 2+), e.g. `requires`, `where`, `invariant`. |
+| `E0202` | Reserved keyword (phase 2+), e.g. `assert`, `where`, `lemma`. |
 | `E0203` | Different arithmetic operators mixed in one chain without parentheses (`a + b * c`, `a + b - c`). |
 | `E0204` | Chained comparison (`a < b < c`). |
 | `E0205` | `&&` and `\|\|` mixed without parentheses. |
-| `E0206` | Keyword valid but construct not available in phase 1 (e.g. `while`). |
+| `E0206` | Retired (was: `while` not available in phase 1). Never emitted; the number is not reused. |
 
 ## Type checker
 
@@ -55,7 +55,7 @@ Specified in [typing.md](typing.md); implemented in `compiler/src/check.rs`.
 | `E0315` | `break`/`continue` outside a loop. |
 | `E0316` | Expression statement is not a call returning `()`. |
 | `E0317` | Recursion (not available in phase 1). |
-| `E0318` | Construct not available in phase 1 (generics, `mod`/`use`, non-empty effects, `int`/`nat`, named array length). |
+| `E0318` | Construct not available in phase 1 (generics, `mod`/`use`, non-empty effects, `nat`, named array length; in spec contexts: casts, array and struct literals, quantifier binders not of type `int`). |
 | `E0319` | Reference type outside a parameter type. |
 | `E0320` | `&mut` argument aliases another argument of the same call. |
 | `E0321` | Unfilled hole. |
@@ -63,10 +63,8 @@ Specified in [typing.md](typing.md); implemented in `compiler/src/check.rs`.
 | `E0323` | Array literal length does not match the expected type. |
 | `E0324` | Struct contains itself by value. |
 | `E0325` | Range index `p[lo..hi]` not directly under `&`/`&mut`. |
+| `E0326` | Spec-only construct in code: `old`, `result`, `forall`, `exists`, `==>`, type `int` ([contracts.md](contracts.md)). |
+| `E0327` | `old` in `requires`, nested `old`, or `old` reading a local that does not exist at function entry. |
+| `E0328` | `result` outside `ensures`, inside `old`, or in a function returning `()`. |
+| `E0329` | Call in a spec context (no `spec fn` yet). |
 
-## Planned
-
-Specified but not yet implemented. Each code moves into the table above, with a variant in `compiler/src/diag.rs`, in the change that implements it. Until then its number is reserved.
-
-- **E0326–E0329**: spec-context errors ([contracts.md §8](contracts.md#8-grammar-and-diagnostics-changes)).
-- When contracts are implemented, `E0202` no longer covers `requires ensures invariant decreases old result forall exists`, `E0206` no longer covers `while`, and `E0318` also covers a quantifier binder whose type is not `int`.

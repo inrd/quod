@@ -1,3 +1,0 @@
-// PROVISIONAL SYNTAX — test input, non-normative.
-// expect: E0206
-fn f() -> () effects {} { while x { } }

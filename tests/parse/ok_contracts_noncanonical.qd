@@ -1,0 +1,4 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+fn f(a: &[u32]) -> bool effects {} requires a.len > 0 ensures result == (a[0] == 1)
+{ let mut i: usize = 0; while i < a.len invariant i <= a.len decreases a.len - i { i += 1; } return a[0] == 1; }

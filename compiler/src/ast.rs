@@ -37,7 +37,7 @@ pub struct Item {
 
 #[derive(Clone, Debug)]
 pub enum ItemKind {
-    Fn(FnDecl),
+    Fn(Box<FnDecl>),
     Type(TypeDecl),
     Mod(Ident),
     Use(Vec<Ident>),
@@ -78,6 +78,8 @@ pub struct FnDecl {
     pub params: Vec<Param>,
     pub ret: Type,
     pub effects: Vec<Ident>,
+    pub requires: Vec<Expr>,
+    pub ensures: Vec<Expr>,
     pub body: Block,
 }
 
@@ -169,6 +171,13 @@ pub enum StmtKind {
         end: Expr,
         body: Block,
     },
+    /// `while c invariant e … decreases d { … }` (`spec/contracts.md` §4).
+    While {
+        cond: Expr,
+        invariants: Vec<Expr>,
+        decreases: Expr,
+        body: Block,
+    },
     Return(Expr),
     Break,
     Continue,
@@ -233,6 +242,8 @@ pub enum BinOp {
     Ge,
     And,
     Or,
+    /// `==>` (spec contexts only).
+    Implies,
 }
 
 impl BinOp {
@@ -256,6 +267,7 @@ impl BinOp {
             BinOp::Ge => ">=",
             BinOp::And => "&&",
             BinOp::Or => "||",
+            BinOp::Implies => "==>",
         }
     }
 }
@@ -296,4 +308,31 @@ pub enum ExprKind {
     Cast(Box<Expr>, Ident),
     Unary(UnOp, Box<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
+    /// `result` (spec contexts only).
+    Result,
+    /// `old(e)` (spec contexts only).
+    Old(Box<Expr>),
+    /// `forall`/`exists k: T in lo..hi { body }` (spec contexts only).
+    Quant(Box<Quant>),
+}
+
+#[derive(Clone, Debug)]
+pub struct Quant {
+    /// `true` for `forall`, `false` for `exists`.
+    pub forall: bool,
+    pub var: Ident,
+    pub ty: Type,
+    pub lo: Expr,
+    pub hi: Expr,
+    pub body: Expr,
+}
+
+impl Quant {
+    pub fn keyword(&self) -> &'static str {
+        if self.forall {
+            "forall"
+        } else {
+            "exists"
+        }
+    }
 }

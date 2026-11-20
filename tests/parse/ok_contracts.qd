@@ -1,0 +1,57 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: ok
+
+pub fn find(xs: &[u32], key: u32) -> usize
+    effects {}
+    ensures result <= xs.len
+    ensures forall k: int in 0..result { xs[k] != key }
+    ensures result < xs.len ==> xs[result] == key
+{
+    let mut i: usize = 0;
+    while i < xs.len
+        invariant i <= xs.len
+        invariant forall k: int in 0..i { xs[k] != key }
+        decreases xs.len - i
+    {
+        if xs[i] == key {
+            return i;
+        }
+        i = i + 1;
+    }
+    return i;
+}
+
+fn fill(dst: &mut [u32], v: u32) -> ()
+    effects {}
+    requires dst.len > 0
+    ensures forall k: int in 0..dst.len { dst[k] == v && old(dst[k]) >= 0 }
+    ensures exists k: int in 0..dst.len { (dst[k] == v) ==> true }
+{
+    let mut i: usize = 0;
+    while i < dst.len
+        decreases dst.len - i
+    {
+        dst[i] = v;
+        i = i + 1;
+    }
+}
+
+fn nested(n: u32) -> u32
+    effects {}
+    requires n < 10 && n > 0 ==> n != 5
+{
+    let mut x: u32 = n;
+    // comment after condition
+    // why
+    while x > 0
+        invariant x <= n
+        decreases x
+    { // inside
+        while false
+            invariant ?inv
+            decreases 0
+        {}
+        x -= 1;
+    }
+    return x;
+}

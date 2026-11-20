@@ -113,6 +113,8 @@ impl IntTy {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum Ty {
     Int(IntTy),
+    /// Spec-only unbounded integer `int` (`spec/contracts.md` §5.1).
+    MathInt,
     Bool,
     #[default]
     Unit,
@@ -130,6 +132,11 @@ impl Ty {
         }
     }
 
+    /// Machine integer or `int`.
+    pub fn is_integer(&self) -> bool {
+        matches!(self, Ty::Int(_) | Ty::MathInt)
+    }
+
     pub fn contains_ref(&self) -> bool {
         match self {
             Ty::Ref(..) => true,
@@ -143,6 +150,7 @@ impl fmt::Display for Ty {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Ty::Int(i) => f.write_str(i.name()),
+            Ty::MathInt => f.write_str("int"),
             Ty::Bool => f.write_str("bool"),
             Ty::Unit => f.write_str("()"),
             Ty::Struct(n) => f.write_str(n),

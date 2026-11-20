@@ -1,0 +1,3 @@
+// PROVISIONAL SYNTAX — test input, non-normative.
+// expect: E0328
+fn f(x: u32) -> () effects {} ensures result == () {}

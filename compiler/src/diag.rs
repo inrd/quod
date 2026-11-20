@@ -41,7 +41,7 @@ pub enum Code {
     E0204,
     /// `&&` and `||` mixed without parentheses.
     E0205,
-    /// Construct not available in phase 1.
+    /// Retired: was `while` before contracts (`spec/contracts.md`). Never emitted.
     E0206,
     /// Unknown name.
     E0301,
@@ -93,6 +93,14 @@ pub enum Code {
     E0324,
     /// Range index not directly under `&`/`&mut`.
     E0325,
+    /// Spec-only construct in code.
+    E0326,
+    /// `old` in `requires`, nested, or reading a non-parameter.
+    E0327,
+    /// `result` outside `ensures` or in a `()` function.
+    E0328,
+    /// Call in a spec context.
+    E0329,
 }
 
 impl Code {
@@ -132,6 +140,10 @@ impl Code {
             Code::E0323 => "E0323",
             Code::E0324 => "E0324",
             Code::E0325 => "E0325",
+            Code::E0326 => "E0326",
+            Code::E0327 => "E0327",
+            Code::E0328 => "E0328",
+            Code::E0329 => "E0329",
         }
     }
 }

@@ -128,11 +128,6 @@ impl Parser {
                 span,
                 format!("`{w}` is reserved for phase 2+ and not available in phase 1"),
             ),
-            TokKind::Kw(Kw::While) => Diagnostic::new(
-                Code::E0206,
-                span,
-                "`while` loops arrive in phase 2 (with `decreases`); use a bounded `for` loop",
-            ),
             found => Diagnostic::new(
                 Code::E0201,
                 span,
@@ -188,7 +183,7 @@ impl Parser {
         let mut leading = self.comments_before(start.start);
         let is_pub = self.eat_kw(Kw::Pub);
         let kind = match self.peek() {
-            TokKind::Kw(Kw::Fn) => ItemKind::Fn(self.fn_decl()?),
+            TokKind::Kw(Kw::Fn) => ItemKind::Fn(Box::new(self.fn_decl(&mut leading)?)),
             TokKind::Kw(Kw::Type) => ItemKind::Type(self.type_decl()?),
             TokKind::Kw(Kw::Mod) => {
                 self.bump();
@@ -270,7 +265,8 @@ impl Parser {
         })
     }
 
-    fn fn_decl(&mut self) -> PResult<FnDecl> {
+    /// Comments between the clauses and the body move to `leading`.
+    fn fn_decl(&mut self, leading: &mut Vec<Comment>) -> PResult<FnDecl> {
         self.expect_kw(Kw::Fn)?;
         let name = self.ident()?;
         let generics = self.generic_params()?;
@@ -304,6 +300,22 @@ impl Parser {
             }
         }
         self.expect(Punct::RBrace)?;
+        let mut requires = Vec::new();
+        while self.eat_kw(Kw::Requires) {
+            requires.push(self.expr()?);
+        }
+        let mut ensures = Vec::new();
+        while self.eat_kw(Kw::Ensures) {
+            ensures.push(self.expr()?);
+        }
+        if self.at_kw(Kw::Requires) {
+            return Err(Diagnostic::new(
+                Code::E0201,
+                self.span(),
+                "`requires` clauses must come before `ensures` clauses",
+            ));
+        }
+        leading.extend(self.comments_before(self.span().start));
         let body = self.block()?;
         Ok(FnDecl {
             name,
@@ -311,6 +323,8 @@ impl Parser {
             params,
             ret,
             effects,
+            requires,
+            ensures,
             body,
         })
     }
@@ -481,6 +495,31 @@ impl Parser {
                     body,
                 }
             }
+            TokKind::Kw(Kw::While) => {
+                self.bump();
+                let cond = self.expr()?;
+                let mut invariants = Vec::new();
+                while self.eat_kw(Kw::Invariant) {
+                    invariants.push(self.expr()?);
+                }
+                self.expect_kw(Kw::Decreases)?;
+                let decreases = self.expr()?;
+                if self.at_kw(Kw::Invariant) || self.at_kw(Kw::Decreases) {
+                    return Err(Diagnostic::new(
+                        Code::E0201,
+                        self.span(),
+                        "a `while` loop has its `invariant` clauses first, then exactly one `decreases`",
+                    ));
+                }
+                leading.extend(self.comments_before(self.span().start));
+                let body = self.block()?;
+                StmtKind::While {
+                    cond,
+                    invariants,
+                    decreases,
+                    body,
+                }
+            }
             TokKind::Kw(Kw::Return) => {
                 self.bump();
                 let e = self.expr()?;
@@ -552,8 +591,21 @@ impl Parser {
 
     // ---- expressions ----
 
+    /// `or_expr [ "==>" or_expr ]`; `==>` is not associative.
     pub fn expr(&mut self) -> PResult<Expr> {
-        self.or_expr()
+        let lhs = self.or_expr()?;
+        if !self.eat(Punct::Implies) {
+            return Ok(lhs);
+        }
+        let rhs = self.or_expr()?;
+        if self.at(Punct::Implies) {
+            return Err(Diagnostic::new(
+                Code::E0201,
+                self.span(),
+                "`==>` cannot be chained; add parentheses, e.g. `a ==> (b ==> c)`",
+            ));
+        }
+        Ok(binary(BinOp::Implies, lhs, rhs))
     }
 
     fn or_expr(&mut self) -> PResult<Expr> {
@@ -742,6 +794,38 @@ impl Parser {
             TokKind::Hole(h) => {
                 self.bump();
                 ExprKind::Hole(h)
+            }
+            TokKind::Kw(Kw::Result) => {
+                self.bump();
+                ExprKind::Result
+            }
+            TokKind::Kw(Kw::Old) => {
+                self.bump();
+                self.expect(Punct::LParen)?;
+                let e = self.expr()?;
+                self.expect(Punct::RParen)?;
+                ExprKind::Old(Box::new(e))
+            }
+            TokKind::Kw(k @ (Kw::Forall | Kw::Exists)) => {
+                self.bump();
+                let var = self.ident()?;
+                self.expect(Punct::Colon)?;
+                let ty = self.ty()?;
+                self.expect_kw(Kw::In)?;
+                let lo = self.expr()?;
+                self.expect(Punct::DotDot)?;
+                let hi = self.expr()?;
+                self.expect(Punct::LBrace)?;
+                let body = self.expr()?;
+                self.expect(Punct::RBrace)?;
+                ExprKind::Quant(Box::new(Quant {
+                    forall: k == Kw::Forall,
+                    var,
+                    ty,
+                    lo,
+                    hi,
+                    body,
+                }))
             }
             TokKind::Punct(Punct::LParen) => {
                 self.bump();
