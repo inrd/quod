@@ -55,7 +55,7 @@ xtask/         repository checks (cargo xtask lint)
 4. [docs/roadmap.md](docs/roadmap.md)
 5. [docs/open-questions.md](docs/open-questions.md)
 
-Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs/oracle-protocol.md), [prior art](docs/prior-art.md), [grammar draft](spec/grammar-draft.md), [typing draft](spec/typing.md), [contracts draft](spec/contracts.md), [canonical format](spec/format.md), [diagnostic codes](spec/diagnostics.md).
+Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs/oracle-protocol.md), [prior art](docs/prior-art.md), [grammar draft](spec/grammar-draft.md), [typing draft](spec/typing.md), [contracts draft](spec/contracts.md), [Core IR draft](spec/core-ir.md), [canonical format](spec/format.md), [diagnostic codes](spec/diagnostics.md).
 
 ## Building
 

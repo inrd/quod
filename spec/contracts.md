@@ -92,7 +92,7 @@ while_stmt = "while" expr { "invariant" expr } "decreases" expr block ;
 
 - **Names in scope:** locals visible at the loop, and the parameters. Locals declared in the body are not in scope in the clauses.
 - `old(e)` in an `invariant` or `decreases` refers to the **function's** entry state, not the loop's.
-- After the loop, code may rely on `invariant ∧ ¬c` when the loop exits through `c`. A `break` exit carries no invariant. Exactly which locals a loop may change (its frame) is `vcgen` behavior, defined in `spec/core-ir.md` (S2b).
+- After the loop, code may rely on `invariant ∧ ¬c` when the loop exits through `c`. A `break` exit carries no invariant. Exactly which locals a loop may change (its frame) is `vcgen` behavior, defined in [core-ir.md §7.4](core-ir.md#74-loops).
 - `decreases` is mandatory ([design-principles §4](../docs/design-principles.md), [Power of 10 rule 2](../docs/power-of-10-mapping.md)): every loop terminates by proof, not by the bounded `for` construct.
 - `break` and `continue` are allowed in a `while` body ([typing.md §6](typing.md#6-statements-and-control-flow)); they are outside the slice subset (§7).
 - A `while` never *always returns* for the definite-return rule, and a statement after it is reachable.
@@ -170,14 +170,14 @@ Until `vcgen` exists (S4a), contracts are type-checked but not proven:
 
 ## 7. Slice subset
 
-The constructs that slice steps S2b–S6 lower, emit and verify. Every other construct still parses and type-checks as in [typing.md](typing.md); lowering to Core IR rejects it with a diagnostic assigned in `spec/core-ir.md` (S2b).
+The constructs that slice steps S2b–S6 lower, emit and verify. Every other construct still parses and type-checks as in [typing.md](typing.md); lowering to Core IR rejects it with `E0401` ([core-ir.md §8](core-ir.md#8-lowering-front-end-untrusted)).
 
 | Area | In the slice | Not in the slice |
 |---|---|---|
 | Scalar types | `u32`, `u64`, `usize`, `bool`, `()` (return type only) | `u8`, `u16`, signed types, `isize` |
 | Compound types | `[T; N]` locals with `T` a slice scalar; `&[T]`, `&mut [T]` parameters | structs, `&T`, `&mut T`, `&[T; N]`, arrays as parameters or return values |
 | Items | `fn` with `requires`/`ensures` | `type` |
-| Statements | `let`, `=`, `+=`/`-=`/`*=`, `if`/`else`, `while`, `return`, call statement, block | `for`, `break`, `continue` |
+| Statements | `let`, `=`, `+=`/`-=`/`*=`, `if`/`else`, `while` (condition without calls), `return`, call statement, block | `for`, `break`, `continue` |
 | Code expressions | literals, locals, `+ - * / %`, `& \| ^ << >>`, `!`, comparisons, `&& \|\|`, `e[i]`, `e.len`, `&mut p[lo..hi]`, `&p[lo..hi]`, passing a slice parameter on, calls, array literals | casts, unary `-`, struct literals, field access |
 | Spec expressions | §5, with the code expressions above except calls | — |
 

@@ -9,7 +9,8 @@ Format: `E` + 4 digits. The first two digits name the stage.
 | `E01xx` | lexer |
 | `E02xx` | parser |
 | `E03xx` | name resolution and type checking ([typing.md](typing.md)) |
-| `E04xx` | C emission (not yet assigned) |
+| `E04xx` | lowering to Core IR ([core-ir.md](core-ir.md); not yet assigned) |
+| `E05xx` | C emission (not yet assigned) |
 
 Phase 1 stops at the first error in each file (no recovery).
 

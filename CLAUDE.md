@@ -33,6 +33,7 @@ Read the relevant ADR before working on the area it covers.
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
 | `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
+| `spec/core-ir.md` | Core IR for the slice: canonical text, operations, obligation generation, lowering (draft, not yet implemented) |
 | `spec/contracts.md` | Contracts, `while` loops, spec contexts and the thin-slice subset (draft; implemented in the front end, not yet lowered or verified) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
