@@ -6,6 +6,8 @@
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** [open-questions.md §13](../open-questions.md#13-memory-model-encoding-in-obligations) (value-level encoding) for v1. Defers [§6](../open-questions.md#6-concurrency-model) (concurrency) past v1 without closing it.
 - **Depends on:** ADR-0002, [ADR-0007](0007-trusted-obligation-generator.md) (sequence encoding), [ADR-0010](0010-trusted-c-emitter-from-core-ir.md) (no optimizer)
+- **Evidence gate:** S3 of [ADR-0006](0006-thin-end-to-end-slice.md) (frame-size reports, for decision 3) and S6 (pool tasks, for decision 1) (both pending)
+- **Revised:** 2026-11-20 (`refines` restricted to `spec fn` references; static storage marked as a v1 target outside the slice; frame-size source per compiler; evidence gate)
 
 ## Context
 
@@ -21,7 +23,9 @@ Three observations narrow the target without giving up the thesis:
 
 SPARK shows that a language in this shape (values, arrays, no general pointers) covers a large share of verified embedded and algorithmic code in industrial use.
 
-`refines` ([design-principles §6](../design-principles.md#6-refinement-workflow)) looks like a separate mechanism, but `impl fn f refines g` says no more than `ensures result == g(args)` (and, for `&mut` parameters, that their final values are those `g` describes). A dedicated equivalence mechanism would duplicate contracts.
+`refines` ([design-principles §6](../design-principles.md#6-refinement-workflow)) looks like a separate mechanism, but `impl fn f refines g` says no more than `ensures result == g(args)` (and, for a `&mut` parameter, that its final value is the one `g` computes). A dedicated equivalence mechanism would duplicate contracts.
+
+That reading needs care. Verification is compositional: a call to an `impl fn` is known only through its contract. If `g` were an `impl fn`, `g(args)` in `f`'s spec would mean "some value satisfying `g`'s `ensures`", which is weaker than "what `g` computes" unless that contract determines the result. Only a `spec fn` has a definition the kernel can unfold (`qd_def_unfold`).
 
 ## Options considered
 
@@ -43,11 +47,16 @@ Option B. **Quod v1** is defined as follows.
 
 1. **Memory: value-level encoding, no general heap.**
    - Obligations contain no heap sort. `&T` is a value; `&mut T` is copy-in/copy-out; slices are views as in ADR-0007.
-   - Storage is local, static (module-level, written only by code holding an `init` capability) or in **pools**: fixed-capacity arrays created at initialization, addressed by index. A pool handle is an index with a range invariant; linked structures link by index. Pools are a library on top of arrays, not a language mechanism.
+   - Storage is local, static (module-level, written only by code holding an `init` capability; a v1 target, not part of the slice, since it needs modules, which ADR-0004 excludes in phase 1, and phase-4 capabilities) or in **pools**: fixed-capacity arrays created at initialization, addressed by index. A pool handle is an index with a range invariant; linked structures link by index. Pools are a library on top of arrays, not a language mechanism.
    - Raw pointers exist only in `trust fn` signatures for FFI, with explicit permission contracts in the trust report.
    - Phase 5 becomes "static storage, pools and FFI permissions". A general heap with separation logic is out of v1; it needs its own ADR and builds on the value-level core (prophecies for stored `&mut`, as in Creusot).
-2. **`refines g` is a contract, not a mechanism.** `impl fn f(p…) refines g` is defined as `ensures result == g(p…)` plus, for each `&mut` parameter `q`, the equation `g` gives for `q`'s final value. `quodc fmt` keeps the `refines` spelling; the human report renders it as "behaves exactly like `g`". Phase 6 is reduced to defining this expansion and showing three measured speedups (its existing exit criterion).
-3. **Resource contracts.** `stack <= n` stays in v1: with no recursion in v1 code and an acyclic call graph, it is a bound computed from per-function frame sizes, which the C compiler reports per target (`-fstack-usage`); the frame-size source is listed in the trust report. `cost` and `mem` are moved out of v1 and marked speculative. `noalloc` stays as a spelling of "no `alloc` effect".
+2. **`refines g` is a contract, not a mechanism.**
+   - `g` must be a `spec fn`. To show that an existing `impl fn h` and a faster `f` agree, write the reference as a `spec fn g` and prove that both refine it.
+   - `f` has exactly one output: a result, or one `&mut` parameter `q`. `g` takes `f`'s parameters by value (`q` by its initial value) and returns that output.
+   - `impl fn f(p…) refines g` is defined as `ensures result == g(p…)`, or `ensures *q == g(…, old(*q), …)` for a `&mut` output.
+   - `f`'s `requires` must imply `g`'s `requires`; this is an obligation at `f`'s entry. Without it, `g(p…)` could be applied outside its domain.
+   - `quodc fmt` keeps the `refines` spelling; the human report renders it as "behaves exactly like `g`". Phase 6 is reduced to defining this expansion and showing three measured speedups (its existing exit criterion).
+3. **Resource contracts.** `stack <= n` stays in v1: with no recursion in v1 code and an acyclic call graph, it is a bound computed from per-function frame sizes. These come from the C compiler that builds the binary (gcc and clang: `-fstack-usage`), which is listed in the trust report. With a compiler that gives no per-function frame report, a build of a program with any `stack` clause fails; it is never skipped. Whether CompCert gives such a report is recorded at S3. `cost` and `mem` are moved out of v1 and marked speculative. `noalloc` stays as a spelling of "no `alloc` effect".
 4. **Single-threaded.** v1 programs have one thread. Interrupt handlers and concurrency are out of v1; open-questions §6 stays open.
 5. **Recursion.** v1 keeps ADR-0004's ban on recursion beyond phase 1 unless a later ADR lifts it with `decreases` and a stack bound. This matches Power of 10 rule 1.
 
@@ -65,4 +74,6 @@ Option B. **Quod v1** is defined as follows.
 - Phase-9 corpus: every task is expressible in v1 (no task needs a general heap). If a large share of the planned corpus (parsers, data structures) cannot be written with pools, v1 is too narrow.
 - Pools: a verified pool library with an index-linked list and a free list, with obligations only in the theories above.
 - `refines`: the three phase-6 refinements check with the expansion and nothing else.
+- **Gate, decision 3 (S3):** gcc and clang give per-function frame sizes for every function in the slice corpus's C; CompCert's support is recorded either way.
+- **Gate, decision 1 (S6):** at least 2 of the 10 S6 tasks use index-linked structures in a pool. Pass: agents solve them at no worse a rate than the other S6 tasks. If they solve the pointer-based versions in the baseline but not the pool versions in Quod, decision 1 is revisited before acceptance.
 - Revisit if agents in S6 or phase 9 consistently fail on index-linked structures where they succeed on pointer-linked ones in the baseline.

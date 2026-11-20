@@ -7,6 +7,8 @@
 - **Supersedes:** [ADR-0003](0003-kernel-logic-and-proof-format.md) (on acceptance, ADR-0003's status becomes `Superseded by ADR-0008`)
 - **Closes:** none new; keeps [open-questions.md §2](../open-questions.md#2-kernel-logic-and-proof-term-format) resolved; no sub-questions left open: bit-vectors are settled in §4 by experiment 0002, sequences in §5 by experiment 0003
 - **Depends on:** ADR-0001, ADR-0002, [experiment 0001](../experiments/0001-alethe-elaboration.md)
+- **Evidence gate:** §4 and §5 passed (experiments [0002](../experiments/0002-bit-vectors.md), [0003](../experiments/0003-seq-as-arrays.md)); §1–§3 pending: experiment 0004 at S4a of [ADR-0006](0006-thin-end-to-end-slice.md)
+- **Revised:** 2026-11-20 (gate measurable before the kernel exists; kernel size estimate for arbitrary-precision arithmetic)
 
 ## Context
 
@@ -96,6 +98,7 @@ Evidence: [experiment 0002](../experiments/0002-bit-vectors.md). With this encod
 ## Consequences
 
 - **Trusted base grows:** kernel code for `qd_poly_norm`'s size bound, `qd_evaluate`, `qd_rewrite` instantiation, the four `la_mult_*` checks, and the premise-form equality rules; axiom-file entries for unprovable rewrite schemas, `div`/`mod` definitions (the latter were needed under ADR-0003 too) and the two array read-over-write axioms (replacing ADR-0003's sequence axioms), and the 9 `qd_bv_int` schema families of §4 (replacing ADR-0003's `BV(n)` sort; no bit-blaster). The trusted obligation generator gains the encodings of §4 and §5, listed in [ADR-0007](0007-trusted-obligation-generator.md#encodings). Provable rewrite schemas add no trust. The kernel's 5,000-line budget (ADR-0001) still applies; if this does not fit, that is a reason to revisit before raising the budget.
+- **Kernel size:** `la_generic`, `qd_poly_norm` and `qd_evaluate` need arbitrary-precision integers and rationals. The kernel is dependency-free, so it implements them itself: add, subtract, multiply, compare, division with remainder, gcd, and no more. *Estimate, not measured:* ~800–1,200 lines for the number code and the polynomial normalizer together, which leaves ~3,800 lines for terms, the proof parser and the remaining rules. Validation below checks this before the rules are written.
 - **Proof size** stays close to solver output (median ~230 Alethe steps in experiment 0001) instead of growing with re-proven rewrites.
 - **Agent loop:** kernel errors still name one step. A failing `qd_rewrite` names the schema, which an agent can look up in `kernel/rewrites`.
 - **Elaborator** is larger (two input formats) but stays untrusted.
@@ -104,8 +107,10 @@ Evidence: [experiment 0002](../experiments/0002-bit-vectors.md). With this encod
 
 ## Validation
 
-- Re-run experiment 0001's corpus through the elaborator and kernel once built: **≥ 80% of solved non-bit-vector obligations** check without manual steps.
+- **Gate, §1–§3 (experiment 0004, at S4a):** an elaborator prototype rewrites the cvc5 certificates (Alethe and CPC) of experiment 0001's corpus. Pass: **≥ 80% of solved non-bit-vector obligations** elaborate, with no manual steps, into certificates whose every step is a §1 rule or a fixed-arity §2 schema, counted by a rule classifier. Carcara checks the steps it supports as a stand-in. It cannot check rewrite schema steps yet, so the classifier checks each of those as a syntactic instance of its named schema, and each schema used is shown valid separately with cvc5. A step that fails either check fails its obligation. This needs no Quod kernel, so it can run before this ADR is accepted.
+- **Gate, §4–§5:** experiments 0002 (bit-vectors) and 0003 (sequences as arrays). Passed; §4 and §5 updated.
+- Phase-2 exit criterion, not a gate: the kernel, once built, checks the same ≥ 80% of experiment 0001's obligations.
 - Every schema in `kernel/rewrites` is either kernel-proven at load or listed in the axiom file; CI fails otherwise.
+- Arbitrary-precision arithmetic and the polynomial normalizer are written first in S4b. If they exceed 1,500 lines, revisit the rule list before writing the other rules.
 - Kernel within budget with all rules above.
-- Experiments 0002 (bit-vectors) and 0003 (sequences as arrays) completed, each followed by an ADR or an update to this one before acceptance. Both done: §4 and §5 updated.
 - Revisit if cvc5 changes RARE or CPC so that the schema list churns between releases, or if `qd_poly_norm`'s size bound rejects common obligations.

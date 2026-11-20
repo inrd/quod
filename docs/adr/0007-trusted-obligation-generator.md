@@ -5,7 +5,9 @@
 - **Deciders:** —
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** trust-boundary item 1 in [architecture.md](../architecture.md#trust-boundaries) ("obligation generation is faithful")
-- **Depends on:** ADR-0001 (Rust, kernel constraints), ADR-0002 (arithmetic semantics), ADR-0003 (kernel logic), ADR-0005 (pointer-sized integers); the encodings follow ADR-0008 (Proposed)
+- **Depends on:** ADR-0001 (Rust, kernel constraints), ADR-0002 (arithmetic semantics), ADR-0005 (pointer-sized integers); kernel logic and encodings follow ADR-0008 (Proposed; supersedes ADR-0003)
+- **Evidence gate:** S4a of [ADR-0006](0006-thin-end-to-end-slice.md): `coreir` and `vcgen` for the slice within budget, every generator soundness case in Validation rejected (pending)
+- **Revised:** 2026-11-20 (trusted `coreir` crate for Core IR types and text; evidence gate)
 
 ## Context
 
@@ -35,8 +37,9 @@ A related gap: the front end turns source (including specs) into Core IR. If it 
 
 Option B now, with Option D as the long-term path.
 
-- `vcgen/` is a workspace crate with the kernel's constraints (std-only plus the `kernel` crate for term types, `#![forbid(unsafe_code)]`, no `HashMap`/`HashSet`, floats, clocks, threads, randomness, I/O during generation) and its own budget: **≤ 3,000 lines excluding tests**.
-- Its input is **Core IR in a canonical text form**, specified in `spec/core-ir.md` before any `vcgen` code is written. The trusted path is: Core IR text → `vcgen` → obligations → kernel.
+- `vcgen/` is a workspace crate with the kernel's constraints (std-only plus the `kernel` crate for term types and the `coreir` crate below, `#![forbid(unsafe_code)]`, no `HashMap`/`HashSet`, floats, clocks, threads, randomness, I/O during generation) and its own budget: **≤ 3,000 lines excluding tests**.
+- Its input is **Core IR in a canonical text form**, specified in `spec/core-ir.md` before any `vcgen` code is written. The trusted path is: Core IR text → `coreir` parser → `vcgen` → obligations → kernel.
+- **`coreir/`** is a separate trusted crate holding the Core IR types, the parser for the canonical text form and its printer. Every trusted consumer of Core IR text (`vcgen`, and `cgen` if [ADR-0010](0010-trusted-c-emitter-from-core-ir.md) is accepted) reads it through this one parser. It has the same constraints as `vcgen` (std-only, no workspace dependencies) and a budget of **≤ 1,500 lines excluding tests**. The parser rejects any text that is not in canonical form, so one Core IR program has exactly one text. The untrusted front end uses `coreir`'s printer to produce the text.
 - The front end (source → Core IR) stays untrusted. To close the spec gap, **human reports are generated from Core IR**, not from source: the human reviews the spec that is actually verified. A round-trip test (source spec → Core IR → rendered spec) catches front-end mistranslation early but is not part of the trusted base.
 - Obligation IDs and fingerprints are computed in `vcgen` from Core IR structure, so they are deterministic by construction.
 
@@ -85,15 +88,23 @@ These rules are part of `vcgen`'s trusted behavior and will be restated normativ
 
 ## Consequences
 
-- **Trusted base grows:** `vcgen` (≤ 3,000 lines) and the Core IR semantics document join the kernel. Both are listed in every trust report. This is not new trust: an obligation generator is trusted under every option except D; this ADR makes it small, constrained and visible.
-- The kernel stays a pure first-order proof checker; its rules (ADR-0003, or ADR-0008 if accepted) and budget are unchanged by this ADR. The sequence and machine-integer encodings move bookkeeping (lengths, view offsets, range facts) from kernel axioms into `vcgen`.
+- **Trusted base grows:** `vcgen` (≤ 3,000 lines), `coreir` (≤ 1,500 lines) and the Core IR semantics document join the kernel. All three are listed in every trust report. This is not new trust: an obligation generator is trusted under every option except D; this ADR makes it small, constrained and visible.
+- The kernel stays a pure first-order proof checker; its rules (ADR-0008) and budget are unchanged by this ADR. The sequence and machine-integer encodings move bookkeeping (lengths, view offsets, range facts) from kernel axioms into `vcgen`.
 - Core IR becomes a stable interface. Changes to its semantics need an ADR, like kernel rule changes.
 - Compilation from Core IR to C (trust-boundary item 2) is still open and unaffected.
 - **Agent loop:** none directly; agents see the same obligations. Reports from Core IR may read slightly less like the source; the report generator must render them carefully.
-- Docs to update on acceptance: `architecture.md` (component table, trust boundaries), `CLAUDE.md` (crate list and constraints), `README.md` layout, new `spec/core-ir.md` (including the encodings above), new `vcgen/README.md`.
+- Docs to update on acceptance: `architecture.md` (component table, trust boundaries), `CLAUDE.md` (crate list and constraints), `README.md` layout, `xtask` (budgets for `coreir` and `vcgen`), new `spec/core-ir.md` (including the encodings above), new `coreir/README.md` and `vcgen/README.md`.
 
 ## Validation
 
-- `vcgen` stays within budget through phase 2.
-- Soundness test suite (phase-2 exit criterion) gains generator cases: programs with known bugs whose obligations must be unprovable. These include out-of-range reads through a view, sequence equality that differs only past `len`, and overflow that is reachable only on a 32-bit target.
+- **Gate (S4a):** `coreir` and `vcgen` for the slice subset are within budget, and every generator soundness case below is rejected: the obligations of a program with a known bug must be unprovable. The cases are written down before `vcgen` code:
+  - an out-of-range read through a view;
+  - sequence equality that differs only past `len`;
+  - overflow that is reachable only on a 32-bit target;
+  - a dropped precondition at a call site;
+  - a loop invariant that holds on entry but is not preserved;
+  - a false `assert` followed by code that is correct given the assertion (the cut rule of [ADR-0013](0013-annotations-and-small-obligations.md)).
+- `coreir` round-trips: printing a parsed canonical text gives the same bytes, on the whole slice corpus.
+- `coreir` and `vcgen` stay within budget through phase 2.
+- The soundness test suite (phase-2 exit criterion) keeps these cases and grows with each new construct.
 - Revisit if Core IR cannot be kept small enough to specify in one document, or if a mechanized semantics (Option D) becomes cheap.

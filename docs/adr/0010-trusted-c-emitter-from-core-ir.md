@@ -5,7 +5,9 @@
 - **Deciders:** —
 - **Author:** Claude (agent), at the maintainer's request
 - **Closes:** trust-boundary item 2 in [architecture.md](../architecture.md#trust-boundaries) ("compilation preserves semantics"). Narrows [open-questions.md §9](../open-questions.md#9-backend-strategy) (C emission, CompCert-compatible).
-- **Depends on:** [ADR-0007](0007-trusted-obligation-generator.md) (Core IR text, trusted `vcgen`), [ADR-0009](0009-annotations-not-proofs.md) (`check` verdict)
+- **Depends on:** [ADR-0007](0007-trusted-obligation-generator.md) (Core IR text, trusted `coreir` and `vcgen`), [ADR-0009](0009-prove-check-split.md) (`check` verdict)
+- **Evidence gate:** S3 of [ADR-0006](0006-thin-end-to-end-slice.md): gcc, clang and CompCert accept the slice corpus's C and agree on its outputs (pending)
+- **Revised:** 2026-11-20 (Core IR read through `coreir`; C99 static checks without `_Static_assert`; portable trap pattern; evidence gate)
 
 ## Context
 
@@ -40,10 +42,12 @@ The optimizer is also redundant with the refinement principle ([design-principle
 
 Option B now; Option D stays the long-term path, together with ADR-0007's.
 
-1. **`cgen/`** is a workspace crate under the kernel's constraints (std-only plus the Core IR types shared with `vcgen`, `#![forbid(unsafe_code)]`, no `HashMap`/`HashSet`, floats, clocks, threads, randomness) with a budget of **≤ 2,000 lines excluding tests**. Its input is Core IR text ([ADR-0007](0007-trusted-obligation-generator.md)); its output is C.
+1. **`cgen/`** is a workspace crate under the kernel's constraints (std-only plus the `coreir` crate, `#![forbid(unsafe_code)]`, no `HashMap`/`HashSet`, floats, clocks, threads, randomness) with a budget of **≤ 2,000 lines excluding tests**. Its input is Core IR text, read through `coreir`'s parser, the same one `vcgen` uses ([ADR-0007](0007-trusted-obligation-generator.md)); its output is C.
 2. **No Quod optimizer.** The "optimizer" component is removed from the architecture. Performance comes from (a) agents writing faster code verified against a reference (refinement) and (b) the C compiler's optimizer on UB-free C.
 3. **Check elision is not a decision `cgen` makes.** From phase 2 on, an unproven precondition is a compile error, so a program that passes `check` has every precondition proven and `cgen` emits no traps. During phase 1 (no proofs), `cgen` emits a trap for every precondition that is not statically trivial (ADR-0002). There is no mixed mode in which `cgen` chooses which checks to drop.
-4. **Emitted C is a documented subset**, specified in `spec/c-subset.md` before `cgen` code is written: C99, `<stdint.h>` fixed-width types, explicit casts on every conversion, unsigned arithmetic only where Core IR's preconditions make the result exact, no implementation-defined behavior that the subset does not pin down (it lists every such assumption, e.g. two's-complement conversions, and checks it with `_Static_assert` in the emitted file).
+4. **Emitted C is a documented subset**, specified in `spec/c-subset.md` before `cgen` code is written: C99, `<stdint.h>` fixed-width types, explicit casts on every conversion, unsigned arithmetic only where Core IR's preconditions make the result exact, no implementation-defined behavior that the subset does not pin down.
+   - The subset lists every implementation-defined assumption (e.g. two's-complement conversions, `CHAR_BIT == 8`). The emitted file checks each one at compile time with the C99 idiom `typedef char qd_assume_<name>[(cond) ? 1 : -1];`, not `_Static_assert`, which is C11.
+   - **Phase-1 traps** use only portable C: each precondition is tested by comparisons on the operands *before* the operation (e.g. `if (b > UINT32_MAX - a) qd_trap(QD_TRAP_OVERFLOW, site);`), never by compiler builtins such as `__builtin_add_overflow`, and never by testing a result after it may have overflowed. `qd_trap` is defined once in the emitted file and calls `abort()`.
 5. **CompCert-compatible.** The subset is accepted by CompCert as well as gcc and clang. The trust report names the C compiler and its version; users who want the smallest trusted base compile with CompCert.
 6. **The phase-1 emitter is `cgen`.** No separate AST → C emitter is written. The front end lowers to Core IR, and Core IR is emitted to C.
 
@@ -57,6 +61,7 @@ Option B now; Option D stays the long-term path, together with ADR-0007's.
 
 ## Validation
 
+- **Gate (S3):** on the slice corpus, emitted C compiles warning-free with gcc and clang (`-std=c99 -Wall -Wextra -Werror`) and with CompCert, and the three binaries give identical outputs; UBSan reports nothing; every trap kind fires on a test input built to trigger it.
 - `cgen` stays within budget through phase 2.
 - On the corpus, emitted C compiles warning-free with gcc, clang and CompCert, and the three binaries give identical outputs on the test inputs; UBSan reports nothing.
 - Differential tests: a Core IR interpreter (untrusted, test-only) and the compiled C agree on the corpus.

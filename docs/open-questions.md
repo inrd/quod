@@ -139,7 +139,7 @@ These are complementary; the question is priority and budget.
 
 A possible compromise: start with option 3 restricted and *visible in the trust report*, and migrate obligations to option 1 as reconstruction matures. That would itself need an ADR.
 
-> **Proposed in [ADR-0009](adr/0009-annotations-not-proofs.md):** option 1, split into two commands. `quodc prove` runs the solver (untrusted, non-deterministic) and stores certificates; `quodc check` runs only `vcgen` and the kernel on stored certificates. Agents edit annotations, not proof steps.
+> **Proposed in [ADR-0009](adr/0009-prove-check-split.md):** option 1, split into two commands. `quodc prove` runs the solver (untrusted, non-deterministic) and stores certificates; `quodc check` runs only `vcgen` and the kernel on stored certificates. [ADR-0013](adr/0013-annotations-and-small-obligations.md) (evidence-gated on S6) adds that agents edit annotations, not proof steps.
 
 ## 13. Memory-model encoding in obligations
 
