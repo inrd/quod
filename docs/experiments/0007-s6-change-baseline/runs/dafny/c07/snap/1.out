@@ -1,0 +1,9 @@
+
+
+c07_pool_rev_len.dfy(47,11): Error: value does not satisfy the subset constraints of 'usize'
+   |
+47 |     n := n + 1;
+   |            ^
+
+
+Dafny program verifier finished with 4 verified, 1 error

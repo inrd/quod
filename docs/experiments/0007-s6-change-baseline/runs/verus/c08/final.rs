@@ -1,0 +1,88 @@
+// Experiment 0007 change task. Do not edit between SPEC-BEGIN and SPEC-END.
+use vstd::prelude::*;
+use vstd::multiset::Multiset;
+
+verus! {
+
+proof fn lemma_push_ms(s: Seq<u32>)
+    ensures forall|x: u32| #[trigger] s.push(x).to_multiset() =~= s.to_multiset().insert(x),
+{
+    broadcast use vstd::seq_lib::group_to_multiset_ensures;
+    assert forall|x: u32| #[trigger] s.push(x).to_multiset() =~= s.to_multiset().insert(x) by {
+        assert(s.push(x).drop_last() =~= s);
+        assert(s.push(x).len() > 0);
+    }
+}
+
+// CHANGE: Merges two sorted arrays into a caller-provided output array
+//   (was: into a newly allocated one).
+// SPEC-BEGIN
+fn merge(a: &[u32], b: &[u32], out: &mut [u32])
+    requires
+        old(out).len() == a.len() + b.len(),
+        forall|i: int, j: int| 0 <= i <= j < a.len() ==> #[trigger] a[i] <= #[trigger] a[j],
+        forall|i: int, j: int| 0 <= i <= j < b.len() ==> #[trigger] b[i] <= #[trigger] b[j],
+    ensures
+        final(out).len() == old(out).len(),
+        forall|i: int, j: int| 0 <= i <= j < final(out).len() ==> #[trigger] final(out)[i] <= #[trigger] final(out)[j],
+        final(out)@.to_multiset() == a@.to_multiset().add(b@.to_multiset()),
+// SPEC-END
+{
+    proof {
+        broadcast use vstd::seq_lib::group_to_multiset_ensures;
+        lemma_push_ms(Seq::<u32>::empty());
+        assert(a@.take(0) =~= Seq::<u32>::empty());
+        assert(b@.take(0) =~= Seq::<u32>::empty());
+        assert(Seq::<u32>::empty().to_multiset() =~= Multiset::<u32>::empty());
+    }
+    let mut i: usize = 0;
+    let mut j: usize = 0;
+    while i < a.len() || j < b.len()
+        invariant
+            i <= a.len(),
+            j <= b.len(),
+            a.len() + b.len() <= usize::MAX,
+            forall|p: int, q: int| 0 <= p <= q < a.len() ==> #[trigger] a[p] <= #[trigger] a[q],
+            forall|p: int, q: int| 0 <= p <= q < b.len() ==> #[trigger] b[p] <= #[trigger] b[q],
+            out.len() == a.len() + b.len(),
+            forall|p: int, q: int| 0 <= p <= q < i + j ==> #[trigger] out[p] <= #[trigger] out[q],
+            forall|k: int| 0 <= k < i + j && i < a.len() ==> out[k] <= a[i as int],
+            forall|k: int| 0 <= k < i + j && j < b.len() ==> out[k] <= b[j as int],
+            out@.take(i + j).to_multiset() == a@.take(i as int).to_multiset().add(b@.take(j as int).to_multiset()),
+        decreases a.len() + b.len() - i - j,
+    {
+        let ghost old = out@.take((i + j) as int);
+        if j >= b.len() || (i < a.len() && a[i] <= b[j]) {
+            let x = a[i];
+            out[i + j] = x;
+            proof {
+                let s = a@.take(i as int);
+                assert(a@.take(i as int + 1) =~= s.push(x));
+                lemma_push_ms(s);
+                lemma_push_ms(old);
+                assert(old.push(x) =~= out@.take((i + j + 1) as int));
+            }
+            i += 1;
+        } else {
+            let x = b[j];
+            out[i + j] = x;
+            proof {
+                let s = b@.take(j as int);
+                assert(b@.take(j as int + 1) =~= s.push(x));
+                lemma_push_ms(s);
+                lemma_push_ms(old);
+                assert(old.push(x) =~= out@.take((i + j + 1) as int));
+            }
+            j += 1;
+        }
+    }
+    proof {
+        assert(a@.take(a.len() as int) =~= a@);
+        assert(b@.take(b.len() as int) =~= b@);
+        assert(out@.take((i + j) as int) =~= out@);
+    }
+}
+
+fn main() {}
+
+} // verus!

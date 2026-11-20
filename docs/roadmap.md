@@ -31,7 +31,7 @@ The narrowest path from source to a kernel-checked function, built before phase 
 | S4a | `vcgen`, elaborator prototype, stand-in checkers (Carcara, Ethos); experiment 0004 (gates for ADR-0007, ADR-0008) | — |
 | S4b | Kernel rules for the slice; replaces the stand-in checker | — |
 | S5 | Minimal oracle over JSON stdio | — |
-| S6 | Agent run: 10 tasks against a Dafny/Verus baseline (gates for ADR-0011, ADR-0013) | baseline half run on two task sets ([experiment 0005](experiments/0005-s6-baseline.md), [0006](experiments/0006-s6-hard-baseline.md)): both solved by the baseline (43/44 runs); Quod half pending |
+| S6 | Agent run: 10 tasks against a Dafny/Verus baseline (gates for ADR-0011, ADR-0013) | baseline half run on three task sets ([experiments 0005](experiments/0005-s6-baseline.md), [0006](experiments/0006-s6-hard-baseline.md), [0007](experiments/0007-s6-change-baseline.md): easy, hard, spec changes): solved by the baseline in 59 of 60 runs; Quod half pending |
 | S7 | Spec-review spike on existing Dafny/Verus programs; off the critical path | may start at any time |
 
 After S6 and S7, phases continue in the order below, widening from the slice.

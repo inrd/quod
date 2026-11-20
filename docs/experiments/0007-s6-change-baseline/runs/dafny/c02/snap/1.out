@@ -1,0 +1,7 @@
+c02_four_flag.dfy(9,7): Error: Verification of 'dutch_flag' timed out after 30 seconds. (the limit can be increased using --verification-time-limit)
+  |
+9 | method dutch_flag(xs: array<u32>) returns (a: usize, b: usize, c: usize)
+  |        ^^^^^^^^^^
+
+
+Dafny program verifier finished with 4 verified, 0 errors, 1 time out

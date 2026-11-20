@@ -1,0 +1,21 @@
+error: postcondition not satisfied
+  --> c05_two_diff.rs:13:9
+   |
+13 |         r.0 ==> r.1 < r.2 < xs.len() && xs[r.2 as int] - xs[r.1 as int] == target,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+33 |             return (true, lo, hi - 1);
+   |             ------------------------- at this exit
+
+error: postcondition not satisfied
+  --> c05_two_diff.rs:14:9
+   |
+14 |         !r.0 ==> forall|a: int, b: int| 0 <= a < b < xs.len() ==> #[trigger] xs[b] - #[trigger] xs[a] != target,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+46 |     (false, 0, 0)
+   |     ------------- at the end of the function body
+
+verification results:: 1 verified, 2 errors
+error: aborting due to 2 previous errors
+

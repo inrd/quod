@@ -1,0 +1,18 @@
+error[E0425]: cannot find function `sum` in this scope
+  --> c04_sum_sq.rs:35:20
+   |
+35 |             acc == sum(xs@.subrange(i as int, n as int)),
+   |                    ^^^
+   |
+  --> /Users/runner/work/verus/verus/source/builtin/src/lib.rs:1211:0
+   |
+   = note: similarly named function `sub` defined here
+help: a function with a similar name exists
+   |
+35 -             acc == sum(xs@.subrange(i as int, n as int)),
+35 +             acc == sub(xs@.subrange(i as int, n as int)),
+   |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0425`.

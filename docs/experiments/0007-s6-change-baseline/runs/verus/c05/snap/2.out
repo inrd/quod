@@ -1,0 +1,9 @@
+error: invariant not satisfied before loop
+  --> c05_two_diff.rs:24:13
+   |
+24 |             b <= n,
+   |             ^^^^^^
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

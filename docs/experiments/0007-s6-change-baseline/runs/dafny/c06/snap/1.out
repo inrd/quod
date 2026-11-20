@@ -1,0 +1,9 @@
+
+
+c06_pool_find.dfy(89,19): Error: value does not satisfy the subset constraints of 'usize'
+   |
+89 |     count := count + 1;
+   |                    ^
+
+
+Dafny program verifier finished with 9 verified, 1 error

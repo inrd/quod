@@ -1,0 +1,33 @@
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> c01_sort_desc.rs:44:16
+   |
+44 |             xs.set(j - 1, y);
+   |                ^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> c01_sort_desc.rs:45:16
+   |
+45 |             xs.set(j, x);
+   |                ^^^
+
+verification results:: 5 verified, 0 errors
+warning: 2 warnings emitted
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> c01_sort_desc.rs:44:16
+   |
+44 |             xs.set(j - 1, y);
+   |                ^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `vstd::slice::SliceAdditionalExecFns::set`: use `slice[i] = value` instead
+  --> c01_sort_desc.rs:45:16
+   |
+45 |             xs.set(j, x);
+   |                ^^^
+
+warning: 2 warnings emitted
+

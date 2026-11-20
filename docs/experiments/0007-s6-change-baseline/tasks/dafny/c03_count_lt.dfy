@@ -1,0 +1,31 @@
+// Experiment 0007 change task. Do not edit between SPEC-BEGIN and SPEC-END.
+type u32 = x: int | 0 <= x < 0x1_0000_0000
+type u64 = x: int | 0 <= x < 0x1_0000_0000_0000_0000
+type usize = x: int | 0 <= x < 0x1_0000_0000_0000_0000
+
+// CHANGE: Counts the elements strictly less than key (was: equal to key).
+// SPEC-BEGIN
+function count_lt(s: seq<u32>, key: u32): nat
+{
+  if |s| == 0 then 0 else (if s[0] < key then 1 else 0) + count_lt(s[1..], key)
+}
+
+method count_lt_key(xs: array<u32>, key: u32) returns (r: usize)
+  requires xs.Length < 0x1_0000_0000_0000_0000
+  ensures r == count_lt(xs[..], key)
+// SPEC-END
+{
+  var i: int := xs.Length;
+  r := 0;
+  while i > 0
+    invariant 0 <= i <= xs.Length
+    invariant r == count(xs[i..], key)
+    invariant r <= xs.Length - i
+    decreases i
+  {
+    i := i - 1;
+    assert xs[i..][1..] == xs[i+1..];
+    if xs[i] == key { r := r + 1; }
+  }
+  assert xs[0..] == xs[..];
+}
