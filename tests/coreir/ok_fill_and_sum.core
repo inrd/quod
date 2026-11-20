@@ -1,0 +1,39 @@
+(quod-core 0)
+
+(fn fill
+  (params (dst (mut (slice u32))) (v u32))
+  (ret unit)
+  (requires)
+  (ensures
+    (forall k 0 (int (len dst)) (= (int (sel dst k)) (int v)))
+    (= (int (len dst)) (int (len (old dst)))))
+  (body
+    (var i usize 0usize)
+    (loop
+      (head
+        (let $0 usize (len dst))
+        (let $1 bool (lt.usize i $0)))
+      (cond $1)
+      (invariant (<= (int i) (int (len dst))))
+      (invariant (forall k 0 (int i) (= (int (sel dst k)) (int v))))
+      (decreases (- (int (len dst)) (int i)))
+      (body
+        (store dst i v)
+        (let $2 usize (add.usize i 1usize))
+        (set i $2)))
+    (return)))
+
+(fn zero_prefix
+  (params (n usize))
+  (ret u32)
+  (requires
+    (<= (int n) 4))
+  (ensures
+    (= (int result) (int (band.u32 result 255u32))))
+  (body
+    (var a (array u32 4) (array u32 1u32 2u32 3u32 4u32))
+    (let $0 (mut (slice u32)) (mview a 0usize n))
+    (call fill $0 0u32)
+    (let $1 u32 (load a 3usize))
+    (let $2 u32 (band.u32 $1 255u32))
+    (return $2)))

@@ -9,9 +9,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-/// Trusted crates and their line budgets (non-test lines), from accepted ADRs.
-/// Add `vcgen` (3,000) and `cgen` (2,000) when ADR-0007 and ADR-0010 are accepted.
-const TRUSTED_CRATES: &[(&str, usize)] = &[("kernel", 5_000)]; // ADR-0001
+/// Trusted crates and their line budgets (non-test lines). `kernel` is from
+/// accepted ADR-0001. `coreir` is built to Proposed ADR-0007, whose evidence
+/// gate is that it stays within budget, so the budget is enforced while it is
+/// built (ADR-0012). Add `vcgen` (3,000) and `cgen` (2,000) when they start.
+const TRUSTED_CRATES: &[(&str, usize)] = &[("kernel", 5_000), ("coreir", 1_500)];
 
 /// Tokens forbidden in trusted crates (ADR-0001: determinism, no I/O, no unsafe).
 const TRUSTED_FORBIDDEN: &[&str] = &[

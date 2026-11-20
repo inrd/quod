@@ -3,6 +3,10 @@
 version = 4
 
 [[package]]
+name = "coreir"
+version = "0.0.0"
+
+[[package]]
 name = "quodc"
 version = "0.1.0"
 

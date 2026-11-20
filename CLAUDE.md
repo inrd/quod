@@ -33,15 +33,16 @@ Read the relevant ADR before working on the area it covers.
 | `docs/adr/` | Architecture decision records (`NNNN-title.md`) |
 | `spec/grammar-draft.md` | Provisional EBNF for the phase-1 core |
 | `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
-| `spec/core-ir.md` | Core IR for the slice: canonical text, operations, obligation generation, lowering (draft, not yet implemented) |
+| `spec/core-ir.md` | Core IR for the slice: canonical text, operations, obligation generation, lowering (draft; text and checks implemented in `coreir/`) |
 | `spec/contracts.md` | Contracts, `while` loops, spec contexts and the thin-slice subset (draft; implemented in the front end, not yet lowered or verified) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
-| `Cargo.toml` | Workspace root; members: `compiler`, `xtask` |
+| `Cargo.toml` | Workspace root; members: `compiler`, `coreir`, `xtask` |
 | `examples/*.qd` | Provisional syntax sketches |
 | `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, CLI |
+| `coreir/` | Core IR types, canonical text parser/printer, well-formedness checks ([spec/core-ir.md](spec/core-ir.md)); trusted if ADR-0007 is accepted; kernel-style constraints, ≤ 1,500 lines |
 | `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
-| `tests/` | `.qd` test corpus; `parse/` and `typecheck/` are run by `compiler/tests/` |
+| `tests/` | Test corpus; `parse/` and `typecheck/` are run by `compiler/tests/`, `coreir/` (`.core` files) by `coreir/tests/` |
 | `tools/` | Pinned external tools for experiments (cvc5, Ethos, CPC signature, Carcara): `tools/fetch.sh` installs them into git-ignored `tools/bin/`; `tools/check-cpc.sh` checks one obligation's CPC proof |
 | `xtask/` | Repository checks (`cargo xtask lint`): links and anchors, ADR index and trusted-base statements, diagnostics registry, `.qd` headers, trusted-crate budgets, no `HashMap`/`HashSet` in `compiler/`. Tooling, not part of the compiler |
 | `.claude/` | Agent setup: permission allowlist, Stop hook (`hooks/check.sh`: fmt check + `cargo xtask lint` when the tree changed), `/accept-adr` skill |
@@ -65,7 +66,8 @@ Read the relevant ADR before working on the area it covers.
 - Before finishing a change: `cargo fmt --all --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, `cargo xtask lint` (the Stop hook runs the first and last automatically).
 - New diagnostics get a new code in `spec/diagnostics.md` and `compiler/src/diag.rs`; never reuse or renumber a code.
 
-- One Cargo workspace at the repo root; crates live in `compiler/`, `kernel/`, `oracle/`.
+- One Cargo workspace at the repo root; crates live in `compiler/`, `coreir/`, `kernel/`, `oracle/`.
+- `coreir/` follows the kernel's constraints below (no dependencies, `#![forbid(unsafe_code)]`, no hash collections, floats, threads, clocks, randomness, environment or file-system access), with a budget of ≤ 1,500 lines excluding tests; `cargo xtask lint` enforces both.
 - **Determinism everywhere:** no `HashMap`/`HashSet` iteration where order can reach output (use `BTreeMap`/`BTreeSet` or `Vec`); outputs, obligation IDs and C code must be byte-identical across runs and machines.
 - **The kernel crate** (`kernel/`) is special and must stay:
   - dependency-free (only `core`/`alloc`/`std`; no other workspace crates);

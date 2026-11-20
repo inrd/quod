@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["compiler", "xtask"]
+members = ["compiler", "coreir", "xtask"]
 
 [workspace.package]
 edition = "2021"

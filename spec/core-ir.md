@@ -1,6 +1,6 @@
 # Core IR — slice subset
 
-> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). Not yet implemented.
+> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). §3 is implemented in `coreir/`; lowering (§8), `vcgen` (§7) and `cgen` are not yet.
 
 ## 1. Role
 
@@ -145,7 +145,7 @@ term      = NAME | "result" | MACHINE_LIT | INT_LIT | "true" | "false"
 
 `coreir` rejects a parsed program that breaks any of these; they are what the trusted consumers may rely on:
 
-- Names are unique per function (parameters, locals, temporaries, binders); every name is defined before use; function names are unique and every call names a function in the file.
+- Names are unique per function (parameters, locals, temporaries); a quantifier binder does not shadow any name in scope, but separate quantifiers may reuse a binder name; every name is defined before use; function names are unique and every call names a function in the file.
 - Every operand has the type its operation requires (§5), with no conversions. `let`/`var` types match their right-hand side.
 - `set` targets a `var` of scalar type; `store` targets a `var` array or a `mut` slice parameter.
 - Values of `ref`/`mut` slice type are defined only by `view`/`mview` (or are parameters) and are used only as call arguments, `len`, `load` and `store` bases.

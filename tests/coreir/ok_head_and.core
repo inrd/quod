@@ -1,0 +1,29 @@
+(quod-core 0)
+
+(fn count
+  (params (xs (ref (slice u64))) (limit u64))
+  (ret usize)
+  (requires)
+  (ensures
+    (=> (< (int result) (int (len xs))) (>= (int (sel xs (int result))) (int limit)))
+    (exists k -1 (+ (int result) 1) (or (= k -1) (< (int (sel xs k)) (int limit)))))
+  (body
+    (var i usize 0usize)
+    (loop
+      (head
+        (let $0 usize (len xs))
+        (let $1 bool (lt.usize i $0))
+        (var $2 bool $1)
+        (if $1
+          (then
+            (let $3 u64 (load xs i))
+            (let $4 bool (lt.u64 $3 limit))
+            (set $2 $4))
+          (else)))
+      (cond $2)
+      (invariant (and (<= (int i) (int (len xs))) (not false)))
+      (decreases (- (int (len xs)) (int i)))
+      (body
+        (let $5 usize (add.usize i 1usize))
+        (set i $5)))
+    (return i)))
