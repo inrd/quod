@@ -70,6 +70,7 @@ fn lint() -> ExitCode {
     check_diagnostics(&files, &mut r);
     check_qd_headers(&files, &mut r);
     check_trusted_crates(&files, &mut r);
+    check_compiler_hash_collections(&files, &mut r);
 
     r.errors.sort();
     r.errors.dedup();
@@ -328,6 +329,13 @@ fn check_adr_index(r: &mut Report) {
             r.err(&f, 0, "missing `- **Status:** …` line");
             continue;
         };
+        if !consequences_state_trusted_base(&text) {
+            r.err(
+                &f,
+                0,
+                "`## Consequences` must state the effect on the trusted base (template rule)",
+            );
+        }
         if !["Proposed", "Accepted", "Rejected", "Superseded"].contains(&status_word(&status)) {
             r.err(&f, 0, format!("unknown status `{status}`"));
         }
@@ -539,6 +547,42 @@ fn check_qd_headers(files: &[PathBuf], r: &mut Report) {
     }
 }
 
+/// The `## Consequences` section mentions the trusted base (even if "none").
+fn consequences_state_trusted_base(text: &str) -> bool {
+    let Some(start) = text.find("\n## Consequences") else {
+        return false;
+    };
+    let section = &text[start + 1..];
+    let end = section[3..].find("\n## ").map_or(section.len(), |i| i + 3);
+    section[..end].to_lowercase().contains("trusted base")
+}
+
+// ---------------------------------------------------------------------------
+// Hash collections in the compiler (CLAUDE.md determinism rule)
+
+/// Stricter than the rule itself (which only forbids hash iteration that can
+/// reach output): no `HashMap`/`HashSet` in `compiler/` at all, so the
+/// question never needs case-by-case review. Use `BTreeMap`/`BTreeSet`/`Vec`.
+fn check_compiler_hash_collections(files: &[PathBuf], r: &mut Report) {
+    for f in files
+        .iter()
+        .filter(|f| f.starts_with("compiler") && has_ext(f, "rs"))
+    {
+        for (i, line) in read(f).lines().enumerate() {
+            let code = line.split("//").next().unwrap_or("");
+            for tok in ["HashMap", "HashSet"] {
+                if contains_token(code, tok) {
+                    r.err(
+                        f,
+                        i + 1,
+                        format!("`{tok}` in the compiler; use BTreeMap/BTreeSet/Vec (determinism)"),
+                    );
+                }
+            }
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Trusted crates: line budget and forbidden constructs
 
@@ -644,6 +688,16 @@ mod tests {
     fn links_skip_inline_code() {
         let line = strip_inline_code("see [x](a.md#b) and `[y](c.md)`");
         assert_eq!(link_targets(&line), vec!["a.md#b".to_string()]);
+    }
+
+    #[test]
+    fn trusted_base_must_be_in_consequences() {
+        let ok = "# A\n## Consequences\n- **Trusted base:** none.\n## Validation\n";
+        let elsewhere = "# A\n## Context\ntrusted base\n## Consequences\n- x\n## Validation\n";
+        let missing = "# A\n## Context\n- x\n";
+        assert!(consequences_state_trusted_base(ok));
+        assert!(!consequences_state_trusted_base(elsewhere));
+        assert!(!consequences_state_trusted_base(missing));
     }
 
     #[test]
