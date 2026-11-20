@@ -32,11 +32,13 @@ Read the relevant ADR before working on the area it covers.
 | `spec/typing.md` | Phase-1 name resolution and type checking (draft) |
 | `spec/format.md` | Canonical format emitted by `quodc fmt` (provisional) |
 | `spec/diagnostics.md` | Diagnostic code registry (provisional) |
-| `Cargo.toml` | Workspace root; members: `compiler` |
+| `Cargo.toml` | Workspace root; members: `compiler`, `xtask` |
 | `examples/*.qd` | Provisional syntax sketches |
 | `compiler/` | `quodc` crate: lexer, parser, AST dump, formatter, type checker, CLI |
 | `kernel/`, `oracle/` | Empty skeletons (phases 2, 3), each with a README stating its future scope |
 | `tests/` | `.qd` test corpus; `parse/` and `typecheck/` are run by `compiler/tests/` |
+| `xtask/` | Repository checks (`cargo xtask lint`): links and anchors, ADR index, diagnostics registry, `.qd` headers, trusted-crate budgets. Tooling, not part of the compiler |
+| `.claude/` | Agent setup: permission allowlist, Stop hook (`hooks/check.sh`: fmt check + `cargo xtask lint` when the tree changed), `/accept-adr` skill |
 
 ## Workflow: docs first, decisions as ADRs
 
@@ -44,14 +46,14 @@ Read the relevant ADR before working on the area it covers.
 2. **Decisions are ADRs.** A design decision (anything that closes an item in `docs/open-questions.md`, changes a principle, or picks a technology) is recorded as an ADR:
    - Copy `docs/adr/0000-template.md` to `docs/adr/NNNN-short-title.md` with the next free number.
    - Status starts as `Proposed`. Only a human maintainer moves it to `Accepted` or `Rejected`.
-   - When accepted, update `docs/open-questions.md` (mark the question resolved and link the ADR) and any doc it affects.
+   - When accepted, update `docs/open-questions.md` (mark the question resolved and link the ADR) and any doc it affects. The `/accept-adr NNNN` skill walks through these edits.
    - ADRs are never edited after acceptance except to set `Superseded by NNNN`.
 3. **Open questions stay open until a human decides.** Agents may add options, evidence and trade-offs to `docs/open-questions.md` and may draft a `Proposed` ADR, but must not treat a question as settled.
 4. **Code follows the roadmap phase.** All implementation code is Rust ([ADR-0001](docs/adr/0001-implementation-language.md)). Only write code for the current roadmap phase (now: phase 1), and only for designs already written down in `docs/` or `spec/`.
 
 ## Rust and kernel rules (ADR-0001)
 
-- Before finishing a change: `cargo fmt --all --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`.
+- Before finishing a change: `cargo fmt --all --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, `cargo xtask lint` (the Stop hook runs the first and last automatically).
 - New diagnostics get a new code in `spec/diagnostics.md` and `compiler/src/diag.rs`; never reuse or renumber a code.
 
 - One Cargo workspace at the repo root; crates live in `compiler/`, `kernel/`, `oracle/`.
