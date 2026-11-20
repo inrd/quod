@@ -62,6 +62,8 @@ How expressive can specs be while keeping plain-language rendering and weakness 
 
 ## 6. Concurrency model
 
+> **Proposed in [ADR-0011](adr/0011-v1-scope.md):** v1 is single-threaded; this question stays open for after v1.
+
 | Option | For | Against |
 |---|---|---|
 | **Deterministic by default** (fork-join, no shared mutable state) | Verification stays sequential-like; reproducible. | Excludes some systems patterns (lock-free structures). |
@@ -99,6 +101,8 @@ Questions: SoA/AoS annotations, alignment, packing, explicit padding, SIMD vecto
 | **MLIR** | Good fit for high-level → low-level lowering and SIMD. | Even larger trusted base; moving target. |
 | **Direct (own backend, possibly verified à la CompCert)** | Smallest trust for codegen in the long run. | Enormous effort; poor performance initially. |
 
+> **Proposed in [ADR-0010](adr/0010-trusted-c-emitter-from-core-ir.md):** C emission only, by a small trusted emitter over Core IR, into a documented C subset that CompCert also accepts. Users pick the C compiler; the trust report names it. No Quod optimizer.
+
 ## 10. Mitigating the lack of training data
 
 | Option | For | Against |
@@ -121,6 +125,8 @@ These are complementary; the question is priority and budget.
 
 > **Speculative:** a diff-oriented report ("this change: + effect `alloc`, contract weakened at `push`, 1 new `trust`") may be more useful than full-module reports.
 
+> **Evidence needed early:** the whole thesis 2 of [vision.md](vision.md) rests on two premises nothing has tested yet: (a) specs stay much smaller than implementations for systems code, and (b) tooling helps humans find spec ↔ intent mismatches. Both can be measured on existing Dafny or Verus programs without any Quod code. [ADR-0006](adr/0006-thin-end-to-end-slice.md) S7 (revised) runs this off the critical path. Also open: who writes specs. If agents draft them from prompts, the human reviews agent output, and the report must show what the agent assumed.
+
 ## 12. Role of the SMT solver
 
 > **Partly settled by [ADR-0003](adr/0003-kernel-logic-and-proof-format.md):** solvers are agent-side only for now; every result is elaborated into kernel-checked steps. Still open: whether a certified, partly trusted fragment is ever worth adding.
@@ -133,6 +139,8 @@ These are complementary; the question is priority and budget.
 
 A possible compromise: start with option 3 restricted and *visible in the trust report*, and migrate obligations to option 1 as reconstruction matures. That would itself need an ADR.
 
+> **Proposed in [ADR-0009](adr/0009-annotations-not-proofs.md):** option 1, split into two commands. `quodc prove` runs the solver (untrusted, non-deterministic) and stores certificates; `quodc check` runs only `vcgen` and the kernel on stored certificates. Agents edit annotations, not proof steps.
+
 ## 13. Memory-model encoding in obligations
 
 The memory model is phase 5, but how memory appears in obligations is fixed in phase 2 ([ADR-0007](adr/0007-trusted-obligation-generator.md) Core IR, [ADR-0003](adr/0003-kernel-logic-and-proof-format.md) sorts). Retrofitting a heap into every obligation later would change Core IR, the generator and every stored proof. The encoding should be chosen before phase 2, even if permissions are implemented later.
@@ -144,3 +152,17 @@ The memory model is phase 5, but how memory appears in obligations is fixed in p
 | **Defer** | Nothing to decide now | Phase-2 encoding becomes a de facto choice made by accident |
 
 > **Evidence (agent's view):** value-level obligations are what agents and SMT solvers handle best; heap terms are where Dafny/Viper proofs most often need manual frame hints. The second-class reference rules in phase 1 make the value-level option exact today, which favors starting there and adding explicit permissions only where values cannot express ownership.
+
+> **Proposed in [ADR-0011](adr/0011-v1-scope.md):** value-level encoding for v1, with no general heap. Storage is local, static or in fixed-capacity pools addressed by index. A pool handle is an index with a range invariant, so pools use only the array encoding validated by [experiment 0003](experiments/0003-seq-as-arrays.md). This follows Power of 10 rules 3 and 9.
+
+## 14. Surface syntax: own or Rust-shaped
+
+Quod's phase-1 surface (`fn`, `let`, `&mut`, `[T; N]`, `Result`, `as` casts) is already close to Rust. The question is whether to make that deliberate: a surface that is, as far as possible, a syntactic subset of Rust, plus contract clauses.
+
+| Option | For | Against |
+|---|---|---|
+| **Own syntax, C-like** (current) | Free to pick every form for LL(1) and canonical formatting; no expectation that Rust semantics apply | No training data; agents must learn it from a reference and examples ([§10](#10-mitigating-the-lack-of-training-data)) |
+| **Rust-shaped subset**: every Quod impl-layer construct is valid Rust with the same meaning; contracts and ghost code in separate clauses | Maximum reuse of agent training data; "false friends" become true friends where meanings match; some Rust tooling (highlighting, rough formatting) works | Where semantics must differ (checked arithmetic as a proof obligation, no implicit deref beyond one level, no traits), the identical syntax invites Rust habits; Rust's grammar is not LL(1) and Quod would restrict it; the "why a new language" argument in [vision.md](vision.md#why-a-new-language) weakens further |
+| **Rust-shaped but deliberately different where semantics differ** | Reuses training data for the common case; marks every semantic difference with a different spelling | Needs a list of differences that agents can learn; boundary judgments per construct |
+
+> **Evidence needed:** [ADR-0006](adr/0006-thin-end-to-end-slice.md) S6 classifies agent errors. A large share of syntax and "false friend" errors favors one of the Rust-shaped options; a small share favors keeping the current surface.

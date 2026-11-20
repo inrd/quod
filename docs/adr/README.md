@@ -19,3 +19,7 @@ Design decisions for Quod are recorded here, one file per decision: `NNNN-short-
 | [0006](0006-thin-end-to-end-slice.md) | Build a thin end-to-end slice before widening phases 1–3 | Proposed |
 | [0007](0007-trusted-obligation-generator.md) | A small trusted obligation generator over a specified Core IR | Proposed |
 | [0008](0008-kernel-rules-from-real-certificates.md) | Kernel rules fitted to real solver certificates (supersedes 0003) | Proposed |
+| [0009](0009-annotations-not-proofs.md) | Agents write annotations; solvers produce certificates; the kernel checks them | Proposed |
+| [0010](0010-trusted-c-emitter-from-core-ir.md) | A small trusted C emitter over Core IR, and no compiler optimizer | Proposed |
+| [0011](0011-v1-scope.md) | v1 scope: value-level memory, no general heap, `refines` as a contract, resource contracts deferred | Proposed |
+| [0012](0012-evidence-before-acceptance.md) | Trusted-base and behavior ADRs stay Proposed until their experiment has run | Proposed |
