@@ -1,0 +1,15 @@
+obligation	instances	inst_verdict	inst_class	inst_steps	inst_A	inst_B	inst_C	inst_D	inst_KB	lib_verdict	lib_class	lib_steps	lib_KB	exp0001_alethe_class
+c01_mask_as_index	1	unsat	C	14	6	5	3	0	1	unsat	C	168	22	D	
+c02_hash_bucket	2	unsat	C	19	9	6	4	0	1	unsat	C	180	23	D	
+c03_top_byte	1	unsat	C	238	109	66	63	0	18	unsat	C	98	9	D	
+c04_add_no_wrap	1	unsat	C	719	363	174	182	0	56	unsat	C	713	60	-	
+c05_shl_is_mul	1	unsat	C	603	299	154	150	0	48	unsat	C	571	49	-	
+c06_range	0	unsat	C	21	9	8	4	0	1	unsat	C	21	2	C	
+x01_and_mask	1	unsat	C	14	6	5	3	0	1	unsat	C	168	22	D	
+x02_lshr_range	1	unsat	C	238	109	66	63	0	18	unsat	C	98	9	D	
+x03_clear_lowest_bit	2	unsat	C	466	213	124	129	0	35	unsat	C	855	78	D	
+x04_shl_is_double	2	unsat	C	88	28	42	18	0	6	unsat	C	104	11	C	
+x05_or_ge	1	unsat	C	14	6	4	4	0	1	unsat	C	163	20	D	
+x06_xor_self	1	unsat	A	1	1	0	0	0	0	unsat	A	12	2	C	
+x07_mask_index	1	unsat	C	15	6	5	4	0	1	unsat	C	164	22	D	
+x08_rotate_byte	6	unsat	C	211217	130161	35340	45716	0	19316	unsat	C	2565	231	D	
