@@ -1,21 +1,21 @@
 # Quod
 
-**Quod** is an experimental systems programming language in which code is written almost entirely by AI agents and every code path is formally verified.
+**Quod** is an experimental systems programming language designed for code written mostly by AI agents, with every code path checked against a contract by a small proof kernel.
 
-It is meant as a C alternative: a low-level, high-performance primitive with **no garbage collector, no runtime and no undefined behavior**. Higher-level abstractions are built on top of it as verified libraries.
+It aims to be a C alternative: a low-level primitive with no garbage collector, no runtime and no undefined behavior, with higher-level abstractions built on top as verified libraries. These are design goals; see the status below for what exists today.
 
 | | |
 |---|---|
 | Compiler | `quodc` |
 | Source extension | `.qd` |
-| Status | **Phase 1 in progress.** Core decisions accepted ([ADR-0001–0003](docs/adr/README.md)). `quodc` parses, formats and type-checks the phase-1 core; no C emitter yet. All syntax is provisional. |
+| Status | **Phase 1 in progress.** `quodc` parses, formats and type-checks the phase-1 core and parses contracts. Nothing is verified yet: no C emitter, `vcgen`, prover or kernel. Accepted decisions are in the [ADR index](docs/adr/README.md). All syntax is provisional. |
 
 ## The idea in four lines
 
 1. Agents make writing code cheap and checking it expensive, so the compiler is a **verification oracle** built for the agent ↔ compiler loop.
 2. Humans review **specs** (spec ↔ intent); a small trusted kernel checks **proofs** (code ↔ spec). Humans should rarely read implementation code.
 3. Verbosity is free for agents, so **nothing is implicit**. Redundant statements are consistency checks.
-4. Proven facts remove runtime checks: **correctness pays for performance**.
+4. Proven facts can replace runtime checks, so proofs should also buy performance.
 
 ## Sketch (provisional, non-normative)
 
@@ -25,7 +25,7 @@ fn push(rb: &mut Ring<f32, N>, x: f32) -> Result<(), Full>
     ensures ok(result) => rb.len == old(rb.len) + 1
 {
     if rb.len == N { return Err(Full); }
-    let i = (rb.head + rb.len) % N;   // proven i < N: no bounds check emitted
+    let i = (rb.head + rb.len) % N;   // intended: proven i < N, so no bounds check
     rb.data[i] = x;
     rb.len += 1;
     return Ok(());
@@ -43,6 +43,8 @@ compiler/      quodc: parser, formatter, type checker (phase 1, in progress)
 kernel/        trusted proof checker                  (empty: phase 2)
 oracle/        JSON query server for agents           (empty: phase 3)
 tests/         test corpus (parse/, typecheck/ populated)
+tools/         pinned external tools for experiments (cvc5, Ethos, Carcara)
+xtask/         repository checks (cargo xtask lint)
 ```
 
 ## Reading order
@@ -60,7 +62,7 @@ Also: [Power of 10 mapping](docs/power-of-10-mapping.md), [oracle protocol](docs
 ```
 cargo build
 cargo test
-./target/debug/quodc check examples/01_core_max.qd
+./target/debug/quodc check examples/01_core_max.qd   # type-check only for now
 ```
 
 ## License
