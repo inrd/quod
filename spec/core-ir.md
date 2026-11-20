@@ -1,6 +1,6 @@
 # Core IR — slice subset
 
-> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). §3 is implemented in `coreir/` and §8 in `compiler/src/lower.rs` (`quodc lower`); `vcgen` (§7) and `cgen` are not yet.
+> **Status: draft, provisional, non-normative.** Step S2b of the thin slice ([ADR-0006](../docs/adr/0006-thin-end-to-end-slice.md)). Built to Proposed [ADR-0007](../docs/adr/0007-trusted-obligation-generator.md) (trusted `coreir` and `vcgen`) and [ADR-0010](../docs/adr/0010-trusted-c-emitter-from-core-ir.md) (trusted `cgen`) under [ADR-0012](../docs/adr/0012-evidence-before-acceptance.md)'s rule for gated designs. If those ADRs are accepted, this document becomes part of the **trusted base** (Core IR semantics). §3 is implemented in `coreir/` and §8 in `compiler/src/lower.rs` (`quodc lower`); `vcgen` (§7) and `cgen` are not yet; the C that `cgen` will emit is specified in [c-subset.md](c-subset.md).
 
 ## 1. Role
 
@@ -151,6 +151,7 @@ term      = NAME | "result" | MACHINE_LIT | INT_LIT | "true" | "false"
 - Values of `ref`/`mut` slice type are defined only by `view`/`mview` (or are parameters) and are used only as call arguments, `len`, `load` and `store` bases.
 - `head` statements contain no `call`, `store` or `return`, and `set` only `var`s declared in the same `head` (code `&&`/`||` in a loop condition lowers to such a `var`).
 - Every path through a function body ends in `return`; `(return)` exactly when the return type is `unit`. No statement follows a `return` in the same list.
+- Proposed by [ADR-0014](../docs/adr/0014-alias-free-views-in-core-ir.md), not yet checked: no `mut` slice argument shares its root with another argument of the same call, and each view is used once, as a call argument in its own statement list, with no write to its root in between. `cgen`'s in-place `mut` slices rely on both ([c-subset.md §6.3](c-subset.md#63-mut-slices-in-place-and-the-calling-convention)).
 - Terms are well-typed (§6); `result` occurs only in `ensures` of a non-`unit` function; `old` only in `ensures`, `invariant`, `decreases`, never nested, and its argument names only parameters and binders.
 
 ## 4. Types and values
@@ -164,7 +165,7 @@ term      = NAME | "result" | MACHINE_LIT | INT_LIT | "true" | "false"
 | `(ref (slice T))`, `(mut (slice T))` | view of a base sequence: base, offset, length | base array, offset term, length term (§7.3) |
 | `int` | all integers (terms only) | `Int` |
 
-Arrays and slices have value semantics in obligations. A `mut` slice parameter behaves as copy-in/copy-out ([ADR-0011](../docs/adr/0011-v1-scope.md)); since `&mut` arguments never alias ([typing.md §8.4](typing.md#84-aliasing-at-calls)), `cgen` may implement it in place.
+Arrays and slices have value semantics in obligations. A `mut` slice parameter behaves as copy-in/copy-out ([ADR-0011](../docs/adr/0011-v1-scope.md)); since `&mut` arguments never alias ([typing.md §8.4](typing.md#84-aliasing-at-calls)), `cgen` may implement it in place ([c-subset.md §6.3](c-subset.md#63-mut-slices-in-place-and-the-calling-convention), which also needs [ADR-0014](../docs/adr/0014-alias-free-views-in-core-ir.md)).
 
 ## 5. Code operations
 
@@ -299,5 +300,5 @@ Lowering does not fold constants, reorder operations or drop operations whose re
 | This document (§3–§7) | yes, if ADR-0007/0010 are accepted | — |
 | `coreir` (types, parser, printer, §3.4 checks) | yes | ≤ 1,500 lines |
 | `vcgen` (§7) | yes | ≤ 3,000 lines |
-| `cgen` (§5, C subset) | yes | ≤ 2,000 lines |
+| `cgen` (§5, [C subset](c-subset.md)) | yes | ≤ 2,000 lines |
 | Lowering, source map, fingerprints | no | — |

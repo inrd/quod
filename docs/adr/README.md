@@ -24,3 +24,4 @@ Design decisions for Quod are recorded here, one file per decision: `NNNN-short-
 | [0011](0011-v1-scope.md) | v1 scope — value-level memory, no general heap, `refines` as a contract, resource contracts deferred | Proposed |
 | [0012](0012-evidence-before-acceptance.md) | Trusted-base and behavior ADRs stay Proposed until their experiment has run | Accepted |
 | [0013](0013-annotations-and-small-obligations.md) | Agents write annotations; small obligations give proof stability | Proposed |
+| [0014](0014-alias-free-views-in-core-ir.md) | Alias-free, fresh slice views as Core IR well-formedness rules | Proposed |

@@ -26,8 +26,8 @@ The narrowest path from source to a kernel-checked function, built before phase 
 | S1 | Elaboration spike: cvc5 certificates against kernel rules | done ([experiment 0001](experiments/0001-alethe-elaboration.md); ADR-0003 superseded by Proposed ADR-0008) |
 | S2 | Slice subset in `spec/`: `u32`, `u64`, `usize`, `bool`, fixed arrays, `&`/`&mut` slices, `while` with `invariant`, `requires`/`ensures` | done ([contracts.md](../spec/contracts.md); parser, formatter, type checker) |
 | S2b | Core IR for the slice and its canonical text ([core-ir.md](../spec/core-ir.md)); front end lowers to it | done: spec, `coreir` crate, lowering (`quodc lower`) |
-| S3a | C subset written down (`spec/c-subset.md`, required by ADR-0010 before `cgen`) | next |
-| S3 | `cgen` over Core IR, phase-1 traps; C accepted by gcc, clang, CompCert (gate for ADR-0010) | — |
+| S3a | C subset written down ([c-subset.md](../spec/c-subset.md), required by ADR-0010 before `cgen`) | done: spec; in-place `mut` slices need Proposed [ADR-0014](adr/0014-alias-free-views-in-core-ir.md) |
+| S3 | `cgen` over Core IR, phase-1 traps; C accepted by gcc, clang, CompCert (gates for ADR-0010, ADR-0014) | next |
 | S4a | `vcgen`, elaborator prototype, stand-in checkers (Carcara, Ethos); experiment 0004 (gates for ADR-0007, ADR-0008) | — |
 | S4b | Kernel rules for the slice; replaces the stand-in checker | — |
 | S5 | Minimal oracle over JSON stdio | — |
